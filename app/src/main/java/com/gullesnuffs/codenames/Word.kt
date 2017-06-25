@@ -22,8 +22,8 @@ class Word(var word: String, var type: WordType, var contacted: Boolean){
         return word
     }
 
-    fun getColor(): Int{
-        if(contacted) {
+    fun getColor(gameState : GameState): Int{
+        if(contacted || gameState == GameState.EnterColors) {
             return when (type) {
                 WordType.Red -> Color.RED
                 WordType.Blue -> Color.BLUE

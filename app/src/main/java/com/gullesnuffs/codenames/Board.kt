@@ -11,6 +11,7 @@ import android.view.View
 
 
 class Board(var words: Array<Array<Word>>,
+            var paintType: WordType,
             var layout: TableLayout,
             val autoCompleteAdapter: ArrayAdapter<String>,
             val gameState: GameState,
@@ -84,6 +85,12 @@ class Board(var words: Array<Array<Word>>,
                         textView
                     }
                     GameState.EnterColors -> {
+                        wordLayout.setOnClickListener(object: View.OnClickListener {
+                            override fun onClick(view: View): Unit {
+                                words[i][j].type = paintType
+                                updateLayout()
+                            }
+                        })
                         val textView: TextView = firstChild as TextView
                         textView
                     }
@@ -109,7 +116,7 @@ class Board(var words: Array<Array<Word>>,
             for (c in 0..(width - 1)) {
                 textViews!![r][c].apply {
                     text = words[r][c].word
-                    setBackgroundColor(words[r][c].getColor())
+                    setBackgroundColor(words[r][c].getColor(gameState))
                     invalidate()
                 }
             }
@@ -119,6 +126,7 @@ class Board(var words: Array<Array<Word>>,
     fun onSaveInstanceState(outState: Bundle, prefix: String){
         outState.putInt(prefix + "_width", width)
         outState.putInt(prefix + "_height", height)
+        outState.putString(prefix + "_paint_type", paintType.toString())
         for(i in 0 until width) {
             for (j in 0 until height) {
                 words[i][j].onSaveInstanceState(outState, prefix + "_word_" + i + "_" + j);
@@ -129,6 +137,7 @@ class Board(var words: Array<Array<Word>>,
     fun onRestoreInstanceState(inState: Bundle, prefix: String){
         width = inState.getInt(prefix + "_width")
         height = inState.getInt(prefix + "_height")
+        paintType = WordType.valueOf(prefix + "_paint_type")
         words = Array<Array<Word>>(height) {
             i -> Array<Word>(width) {
                 j -> Word(inState, prefix + "_word_" + i + "_" + j)

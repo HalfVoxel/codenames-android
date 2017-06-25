@@ -8,9 +8,12 @@ import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import kotlinx.android.synthetic.main.activity_main.*
 import android.widget.TableLayout
 import android.widget.ArrayAdapter
+import kotlinx.android.synthetic.main.content_main.*
 import android.content.Intent
 import android.support.v4.app.ActivityCompat
 import android.widget.Toast
@@ -27,7 +30,7 @@ enum class GameState {
 class MainActivity : AppCompatActivity() {
 
     var board: Board? = null
-    var gameState: GameState = GameState.EnterWords
+    var gameState = GameState.EnterWords
     var autoCompleteAdapter: ArrayAdapter<String>? = null
     var boardLayout: TableLayout? = null
 
@@ -45,30 +48,45 @@ class MainActivity : AppCompatActivity() {
         autoCompleteAdapter = ArrayAdapter<String>(this,
                 R.layout.autocomplete_list_item,
                 getResources().getStringArray(R.array.wordlist))
-        board = Board(words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+        board = Board(words, WordType.Red, boardLayout!!, autoCompleteAdapter!!, gameState, this)
 
-        nextGameState.setOnClickListener { view ->
+        nextGameState.setOnClickListener { _ ->
             if(gameState == GameState.EnterWords){
                 gameState = GameState.EnterColors
             }
             else if(gameState == GameState.EnterColors){
                 gameState = GameState.GetClues
             }
-            updateNavigationButtons()
-            board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+            updateLayout()
         }
 
-        previousGameState.setOnClickListener { view ->
+        previousGameState.setOnClickListener { _ ->
             if(gameState == GameState.EnterColors){
                 gameState = GameState.EnterWords
             }
             else if(gameState == GameState.GetClues){
                 gameState = GameState.EnterColors
             }
-            updateNavigationButtons()
-            board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+            updateLayout()
         }
-        updateNavigationButtons()
+
+        place_red_spy_button.setOnClickListener { _ ->
+            board!!.paintType = WordType.Red
+        }
+
+        place_blue_spy_button.setOnClickListener { _ ->
+            board!!.paintType = WordType.Blue
+        }
+
+        place_civilian_button.setOnClickListener { _ ->
+            board!!.paintType = WordType.Civilian
+        }
+
+        place_assassin_button.setOnClickListener { _ ->
+            board!!.paintType = WordType.Assassin
+        }
+
+        updateLayout()
         
         ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.CAMERA),
@@ -112,6 +130,21 @@ class MainActivity : AppCompatActivity() {
         nextGameState.invalidate()
     }
 
+    fun updateBoard(){
+        board = Board(board!!.words, board!!.paintType, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+    }
+
+    fun updateLayout(){
+        updateNavigationButtons()
+        updateBoard()
+
+        val colorPickerVisibility = if(gameState == GameState.EnterColors) VISIBLE else INVISIBLE
+        place_red_spy_button.visibility = colorPickerVisibility
+        place_blue_spy_button.visibility = colorPickerVisibility
+        place_civilian_button.visibility = colorPickerVisibility
+        place_assassin_button.visibility = colorPickerVisibility
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -142,8 +175,7 @@ class MainActivity : AppCompatActivity() {
         board!!.onRestoreInstanceState(inState, "board")
         if(newGameState != gameState){
             gameState = GameState.valueOf(inState.getString("game_state"))
-            updateNavigationButtons()
-            board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+            updateLayout()
         }
         board!!.updateLayout()
         super.onRestoreInstanceState(inState)
