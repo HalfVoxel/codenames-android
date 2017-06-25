@@ -137,7 +137,7 @@ class Board(var words: Array<Array<Word>>,
     fun onRestoreInstanceState(inState: Bundle, prefix: String){
         width = inState.getInt(prefix + "_width")
         height = inState.getInt(prefix + "_height")
-        paintType = WordType.valueOf(prefix + "_paint_type")
+        paintType = WordType.valueOf(inState.getString(prefix + "_paint_type"))
         words = Array<Array<Word>>(height) {
             i -> Array<Word>(width) {
                 j -> Word(inState, prefix + "_word_" + i + "_" + j)

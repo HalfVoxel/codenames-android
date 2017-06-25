@@ -143,6 +143,17 @@ class MainActivity : AppCompatActivity() {
         place_blue_spy_button.visibility = colorPickerVisibility
         place_civilian_button.visibility = colorPickerVisibility
         place_assassin_button.visibility = colorPickerVisibility
+
+        when(gameState){
+            GameState.EnterWords ->
+                instructions.setText(R.string.instructions_enter_words)
+
+            GameState.EnterColors ->
+                instructions.setText(R.string.instructions_enter_colors)
+
+            GameState.GetClues ->
+                instructions.setText(R.string.instructions_get_clues)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
