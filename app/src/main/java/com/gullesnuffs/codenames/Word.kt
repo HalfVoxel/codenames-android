@@ -1,4 +1,4 @@
-package com.codenames
+package com.gullesnuffs.codenames
 
 import android.graphics.Color
 

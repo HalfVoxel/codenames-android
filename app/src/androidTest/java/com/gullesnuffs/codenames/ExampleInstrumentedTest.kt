@@ -1,4 +1,4 @@
-package com.codenames.omogenheap.codenames
+package com.gullesnuffs.codenames
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4

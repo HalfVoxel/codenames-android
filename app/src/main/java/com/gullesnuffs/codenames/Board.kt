@@ -1,13 +1,10 @@
-package com.codenames
+package com.gullesnuffs.codenames
 
-import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.widget.*
 import android.widget.AutoCompleteTextView
 import android.widget.ArrayAdapter
-
 
 
 class Board(var words: Array<Array<Word>>, var layout: TableLayout, val autoCompleteAdapter: ArrayAdapter<String>){

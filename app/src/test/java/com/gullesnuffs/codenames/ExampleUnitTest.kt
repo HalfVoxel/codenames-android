@@ -1,4 +1,4 @@
-package com.codenames.omogenheap.codenames
+package com.gullesnuffs.codenames
 
 import org.junit.Test
 
