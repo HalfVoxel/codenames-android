@@ -1,11 +1,9 @@
 package com.gullesnuffs.codenames
 
+import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.*
-import android.widget.AutoCompleteTextView
-import android.widget.ArrayAdapter
-
 
 class Board(var words: Array<Array<Word>>, var layout: TableLayout, val autoCompleteAdapter: ArrayAdapter<String>){
 
@@ -56,9 +54,31 @@ class Board(var words: Array<Array<Word>>, var layout: TableLayout, val autoComp
         for(r in 0..(height-1)) {
             for (c in 0..(width - 1)) {
                 textViews!![r][c].apply {
-                    setText(words[r][c].word)
+                    println("Found word in update layout: " + words[r][c])
+                    text = words[r][c].word
                     setBackgroundColor(words[r][c].getColor())
+                    invalidate()
                 }
+            }
+        }
+    }
+
+    fun onSaveInstanceState(outState: Bundle, prefix: String){
+        outState.putInt(prefix + "_width", width)
+        outState.putInt(prefix + "_height", height)
+        for(i in 0 until width) {
+            for (j in 0 until height) {
+                words[i][j].onSaveInstanceState(outState, prefix + "_word_" + i + "_" + j);
+            }
+        }
+    }
+
+    fun onRestoreInstanceState(inState: Bundle, prefix: String){
+        width = inState.getInt(prefix + "_width")
+        height = inState.getInt(prefix + "_height")
+        words = Array<Array<Word>>(height) {
+            i -> Array<Word>(width) {
+                j -> Word(inState, prefix + "_word_" + i + "_" + j)
             }
         }
     }

@@ -13,6 +13,8 @@ import android.widget.ArrayAdapter
 
 class MainActivity : AppCompatActivity() {
 
+    var board: Board? = null;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         val autoCompleteAdapter = ArrayAdapter<String>(this,
                 R.layout.autocomplete_list_item,
                 getResources().getStringArray(R.array.wordlist))
-        val board: Board = Board(words, boardLayout, autoCompleteAdapter)
+        board = Board(words, boardLayout, autoCompleteAdapter)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -49,6 +51,21 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    // invoked when the activity may be temporarily destroyed, save the instance state here
+    override fun onSaveInstanceState(outState: Bundle)
+    {
+        board?.onSaveInstanceState(outState, "board")
+        // call superclass to save any view hierarchy
+        super.onSaveInstanceState(outState);
+    }
+
+    override fun onRestoreInstanceState(inState: Bundle)
+    {
+        board!!.onRestoreInstanceState(inState, "board")
+        board!!.updateLayout()
+        super.onRestoreInstanceState(inState)
     }
 
     /**
