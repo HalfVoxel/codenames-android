@@ -8,7 +8,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "26.0.0"
     defaultConfig {
-        applicationId "com.codenames.omogenheap.codenames"
+        applicationId "com.codenames"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1

@@ -1,4 +1,4 @@
-package com.codenames.omogenheap.codenames
+package com.codenames
 
 import android.content.Context
 import android.text.Editable

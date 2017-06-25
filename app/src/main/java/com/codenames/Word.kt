@@ -1,4 +1,4 @@
-package com.codenames.omogenheap.codenames
+package com.codenames
 
 import android.graphics.Color
 
