@@ -12,6 +12,6 @@
         android:fontFamily="sans-serif"
         android:textStyle="bold"
         android:maxLines="1"
-        android:inputType="text|textCapCharacters"
+        android:inputType="text|textCapCharacters|textPhonetic"
         android:textSize="@dimen/codeword_text_size"/>
 </LinearLayout>

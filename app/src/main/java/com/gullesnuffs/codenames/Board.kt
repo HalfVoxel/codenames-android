@@ -3,6 +3,7 @@ package com.gullesnuffs.codenames
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.widget.*
 import android.view.LayoutInflater
@@ -54,6 +55,19 @@ class Board(var words: Array<Array<Word>>,
                     GameState.EnterWords -> {
                         val textView: AutoCompleteTextView = firstChild as AutoCompleteTextView
                         textView.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
+
+                        val editFilters = textView.getFilters()
+                        val newFilters = Array<InputFilter>(editFilters.size + 1) {
+                            i ->
+                            if(i < editFilters.size){
+                                editFilters[i]
+                            }
+                            else{
+                                InputFilter.AllCaps()
+                            }
+                        }
+                        textView.setFilters(newFilters)
+
                         textView.addTextChangedListener(object : TextWatcher {
                             override fun beforeTextChanged(s: CharSequence?,
                                                            start: Int, count: Int, after: Int) {
