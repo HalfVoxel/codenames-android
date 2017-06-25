@@ -1,11 +1,19 @@
 package com.gullesnuffs.codenames
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.*
+import android.view.LayoutInflater
 
-class Board(var words: Array<Array<Word>>, var layout: TableLayout, val autoCompleteAdapter: ArrayAdapter<String>){
+
+
+class Board(var words: Array<Array<Word>>,
+            var layout: TableLayout,
+            val autoCompleteAdapter: ArrayAdapter<String>,
+            val gameState: GameState,
+            val context: Context){
 
     var width: Int = words[0].size
     var height: Int = words.size
@@ -14,12 +22,24 @@ class Board(var words: Array<Array<Word>>, var layout: TableLayout, val autoComp
 
     init{
 
+        val inflater = LayoutInflater.from(context)
+
+        layout.removeAllViews()
+
         wordLayouts = Array<Array<LinearLayout>>(height)
         {
             i ->
-            val row = layout.getChildAt(i) as TableRow
+            val row : TableRow = TableRow(context)
+            layout.addView(row)
             Array<LinearLayout>(width) {
-                j -> row.getChildAt(j) as LinearLayout
+                j ->
+                if(gameState == GameState.EnterWords) {
+                    inflater.inflate(R.layout.editable_word, row)
+                }
+                else{
+                    inflater.inflate(R.layout.word, row)
+                }
+                row.getChildAt(j) as LinearLayout
             }
         }
 
@@ -28,22 +48,28 @@ class Board(var words: Array<Array<Word>>, var layout: TableLayout, val autoComp
             i -> Array<TextView>(width)
             {
                 j ->
-                val textView : AutoCompleteTextView = wordLayouts!![i][j].getChildAt(0) as AutoCompleteTextView
-                textView.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
-                textView.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?,
-                                                   start: Int, count: Int, after: Int) {
-                    }
+                if(gameState == GameState.EnterWords) {
+                    val textView: AutoCompleteTextView = wordLayouts!![i][j].getChildAt(0) as AutoCompleteTextView
+                    textView.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
+                    textView.addTextChangedListener(object : TextWatcher {
+                        override fun beforeTextChanged(s: CharSequence?,
+                                                       start: Int, count: Int, after: Int) {
+                        }
 
-                    override fun afterTextChanged(s: Editable?) {
-                    }
+                        override fun afterTextChanged(s: Editable?) {
+                        }
 
-                    override fun onTextChanged(s: CharSequence?,
-                                               start: Int, before: Int, count: Int) {
-                        words[i][j].word = s.toString()
-                    }
-                })
-                textView
+                        override fun onTextChanged(s: CharSequence?,
+                                                   start: Int, before: Int, count: Int) {
+                            words[i][j].word = s.toString()
+                        }
+                    })
+                    textView
+                }
+                else{
+                    val textView: TextView = wordLayouts!![i][j].getChildAt(0) as TextView
+                    textView
+                }
             }
         }
 
@@ -54,7 +80,6 @@ class Board(var words: Array<Array<Word>>, var layout: TableLayout, val autoComp
         for(r in 0..(height-1)) {
             for (c in 0..(width - 1)) {
                 textViews!![r][c].apply {
-                    println("Found word in update layout: " + words[r][c])
                     text = words[r][c].word
                     setBackgroundColor(words[r][c].getColor())
                     invalidate()

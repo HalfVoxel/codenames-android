@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:background = "#C0C0C0">
 
-    <TextView
+    <AutoCompleteTextView
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:text="WORD"
@@ -12,5 +12,6 @@
         android:fontFamily="sans-serif"
         android:textStyle="bold"
         android:maxLines="1"
+        android:inputType="text|textCapCharacters"
         android:textSize="@dimen/codeword_text_size"/>
 </LinearLayout>

@@ -1,40 +1,51 @@
 package com.gullesnuffs.codenames
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
 import android.widget.TableLayout
 import android.widget.ArrayAdapter
 
+enum class GameState {
+    EnterWords,
+    EnterColors,
+    GetClues
+}
 
 class MainActivity : AppCompatActivity() {
 
-    var board: Board? = null;
+    var board: Board? = null
+    var gameState: GameState = GameState.EnterWords
+    var autoCompleteAdapter: ArrayAdapter<String>? = null
+    var boardLayout: TableLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
-
-        val boardLayout: TableLayout = findViewById(R.id.board) as TableLayout
+        boardLayout = findViewById(R.id.board) as TableLayout
         val words: Array<Array<Word>> = Array<Array<Word>>(5) {
             Array<Word>(5){
                 Word("", WordType.Civilian, false)
             }
         }
-        val autoCompleteAdapter = ArrayAdapter<String>(this,
+        autoCompleteAdapter = ArrayAdapter<String>(this,
                 R.layout.autocomplete_list_item,
                 getResources().getStringArray(R.array.wordlist))
-        board = Board(words, boardLayout, autoCompleteAdapter)
+        board = Board(words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+
+        nextGameState.setOnClickListener { view ->
+            if(gameState == GameState.EnterWords){
+                gameState = GameState.EnterColors
+            }
+            else if(gameState == GameState.EnterColors){
+                gameState = GameState.GetClues
+            }
+            board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -56,14 +67,19 @@ class MainActivity : AppCompatActivity() {
     // invoked when the activity may be temporarily destroyed, save the instance state here
     override fun onSaveInstanceState(outState: Bundle)
     {
+        outState.putString("game_state", gameState.toString());
         board?.onSaveInstanceState(outState, "board")
-        // call superclass to save any view hierarchy
         super.onSaveInstanceState(outState);
     }
 
     override fun onRestoreInstanceState(inState: Bundle)
     {
+        val newGameState = GameState.valueOf(inState.getString("game_state"))
         board!!.onRestoreInstanceState(inState, "board")
+        if(newGameState != gameState){
+            gameState = GameState.valueOf(inState.getString("game_state"))
+            board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+        }
         board!!.updateLayout()
         super.onRestoreInstanceState(inState)
     }
