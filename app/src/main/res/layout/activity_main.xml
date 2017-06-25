@@ -31,4 +31,13 @@
         app:backgroundTint="@android:color/holo_green_light"
         app:srcCompat="@drawable/ic_arrow_forward_black_24dp" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/previousGameState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@android:color/holo_green_light"
+        app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
+
 </android.support.design.widget.CoordinatorLayout>

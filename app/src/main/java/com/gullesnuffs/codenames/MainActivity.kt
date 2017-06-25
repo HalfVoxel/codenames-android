@@ -46,6 +46,16 @@ class MainActivity : AppCompatActivity() {
             }
             board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
         }
+
+        previousGameState.setOnClickListener { view ->
+            if(gameState == GameState.EnterColors){
+                gameState = GameState.EnterWords
+            }
+            else if(gameState == GameState.GetClues){
+                gameState = GameState.EnterColors
+            }
+            board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
