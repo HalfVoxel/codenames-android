@@ -1,6 +1,8 @@
 package com.codenames.omogenheap.codenames
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.widget.*
 import android.widget.AutoCompleteTextView
@@ -33,6 +35,19 @@ class Board(var words: Array<Array<Word>>, var layout: TableLayout, val autoComp
                 j ->
                 val textView : AutoCompleteTextView = wordLayouts!![i][j].getChildAt(0) as AutoCompleteTextView
                 textView.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
+                textView.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?,
+                                                   start: Int, count: Int, after: Int) {
+                    }
+
+                    override fun afterTextChanged(s: Editable?) {
+                    }
+
+                    override fun onTextChanged(s: CharSequence?,
+                                               start: Int, before: Int, count: Int) {
+                        words[i][j].word = s.toString()
+                    }
+                })
                 textView
             }
         }
