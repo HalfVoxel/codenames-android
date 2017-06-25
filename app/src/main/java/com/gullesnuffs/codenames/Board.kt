@@ -6,7 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.*
 import android.view.LayoutInflater
-
+import android.view.View
 
 
 class Board(var words: Array<Array<Word>>,
@@ -48,27 +48,41 @@ class Board(var words: Array<Array<Word>>,
             i -> Array<TextView>(width)
             {
                 j ->
-                if(gameState == GameState.EnterWords) {
-                    val textView: AutoCompleteTextView = wordLayouts!![i][j].getChildAt(0) as AutoCompleteTextView
-                    textView.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
-                    textView.addTextChangedListener(object : TextWatcher {
-                        override fun beforeTextChanged(s: CharSequence?,
-                                                       start: Int, count: Int, after: Int) {
-                        }
+                val wordLayout = wordLayouts!![i][j]
+                val firstChild = wordLayout.getChildAt(0)
+                when(gameState) {
+                    GameState.EnterWords -> {
+                        val textView: AutoCompleteTextView = firstChild as AutoCompleteTextView
+                        textView.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
+                        textView.addTextChangedListener(object : TextWatcher {
+                            override fun beforeTextChanged(s: CharSequence?,
+                                                           start: Int, count: Int, after: Int) {
+                            }
 
-                        override fun afterTextChanged(s: Editable?) {
-                        }
+                            override fun afterTextChanged(s: Editable?) {
+                            }
 
-                        override fun onTextChanged(s: CharSequence?,
-                                                   start: Int, before: Int, count: Int) {
-                            words[i][j].word = s.toString()
-                        }
-                    })
-                    textView
-                }
-                else{
-                    val textView: TextView = wordLayouts!![i][j].getChildAt(0) as TextView
-                    textView
+                            override fun onTextChanged(s: CharSequence?,
+                                                       start: Int, before: Int, count: Int) {
+                                words[i][j].word = s.toString()
+                            }
+                        })
+                        textView
+                    }
+                    GameState.EnterColors -> {
+                        val textView: TextView = firstChild as TextView
+                        textView
+                    }
+                    GameState.GetClues -> {
+                        wordLayout.setOnClickListener(object: View.OnClickListener {
+                            override fun onClick(view: View): Unit {
+                                words[i][j].contacted = !words[i][j].contacted
+                                updateLayout()
+                            }
+                        })
+                        val textView: TextView = firstChild as TextView
+                        textView
+                    }
                 }
             }
         }
