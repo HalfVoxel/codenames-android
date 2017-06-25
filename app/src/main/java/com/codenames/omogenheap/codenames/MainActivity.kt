@@ -34,7 +34,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
         val autoCompleteAdapter = ArrayAdapter<String>(this,
-                R.layout.autocomplete_list_item, arrayOf("BERMUDA", "ANTARCTICA"))
+                R.layout.autocomplete_list_item,
+                getResources().getStringArray(R.array.wordlist))
         val board: Board = Board(words, boardLayout, autoCompleteAdapter)
     }
 

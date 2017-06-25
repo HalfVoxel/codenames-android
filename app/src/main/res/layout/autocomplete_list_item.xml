@@ -5,5 +5,6 @@
     android:textAppearance="?android:attr/textAppearanceLargePopupMenu"
     android:singleLine="true"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:ellipsize="marquee"/>
+    android:layout_height="@dimen/autocomplete_item_height"
+    android:ellipsize="none"
+    android:textSize="@dimen/autocomplete_text_size"/>
