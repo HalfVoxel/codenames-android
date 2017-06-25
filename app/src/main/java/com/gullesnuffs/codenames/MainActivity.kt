@@ -145,14 +145,20 @@ class MainActivity : AppCompatActivity() {
         place_assassin_button.visibility = colorPickerVisibility
 
         when(gameState){
-            GameState.EnterWords ->
+            GameState.EnterWords -> {
                 instructions.setText(R.string.instructions_enter_words)
+                take_a_photo_layout.visibility = VISIBLE
+            }
 
-            GameState.EnterColors ->
+            GameState.EnterColors -> {
                 instructions.setText(R.string.instructions_enter_colors)
+                take_a_photo_layout.visibility = VISIBLE
+            }
 
-            GameState.GetClues ->
+            GameState.GetClues -> {
                 instructions.setText(R.string.instructions_get_clues)
+                take_a_photo_layout.visibility = INVISIBLE
+            }
         }
     }
 
