@@ -1,6 +1,9 @@
 package com.gullesnuffs.codenames
 
+import android.annotation.TargetApi
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -44,6 +47,7 @@ class MainActivity : AppCompatActivity() {
             else if(gameState == GameState.EnterColors){
                 gameState = GameState.GetClues
             }
+            updateNavigationButtons()
             board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
         }
 
@@ -54,8 +58,25 @@ class MainActivity : AppCompatActivity() {
             else if(gameState == GameState.GetClues){
                 gameState = GameState.EnterColors
             }
+            updateNavigationButtons()
             board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
         }
+        updateNavigationButtons()
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    fun updateNavigationButtons(){
+        val forwardColor = if(gameState == GameState.GetClues) R.color.navigation_disabled else R.color.navigation_enabled
+        nextGameState.setBackgroundTintList(getResources().getColorStateList(
+                forwardColor,
+                getTheme()))
+        nextGameState.invalidate()
+
+        val backColor = if(gameState == GameState.EnterWords) R.color.navigation_disabled else R.color.navigation_enabled
+        previousGameState.setBackgroundTintList(getResources().getColorStateList(
+                backColor,
+                getTheme()))
+        nextGameState.invalidate()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -88,6 +109,7 @@ class MainActivity : AppCompatActivity() {
         board!!.onRestoreInstanceState(inState, "board")
         if(newGameState != gameState){
             gameState = GameState.valueOf(inState.getString("game_state"))
+            updateNavigationButtons()
             board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
         }
         board!!.updateLayout()

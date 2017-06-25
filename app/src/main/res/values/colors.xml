@@ -3,4 +3,6 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="navigation_enabled">@android:color/holo_green_light</color>
+    <color name="navigation_disabled">#B0B0B0</color>
 </resources>
