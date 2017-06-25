@@ -1,6 +1,7 @@
 package com.gullesnuffs.codenames
 
 import android.annotation.TargetApi
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
@@ -10,6 +11,12 @@ import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_main.*
 import android.widget.TableLayout
 import android.widget.ArrayAdapter
+import android.content.Intent
+import android.support.v4.app.ActivityCompat
+import android.widget.Toast
+import android.content.pm.PackageManager
+
+
 
 enum class GameState {
     EnterWords,
@@ -62,6 +69,32 @@ class MainActivity : AppCompatActivity() {
             board = Board(board!!.words, boardLayout!!, autoCompleteAdapter!!, gameState, this)
         }
         updateNavigationButtons()
+        
+        ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.CAMERA),
+                1);
+    }
+    
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            1 -> {
+
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay!
+                    //val i = Intent(this, CameraActivity::class.java)
+                    //startActivity(i)
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this@MainActivity, "Permission denied!", Toast.LENGTH_SHORT).show()
+                    System.exit(1)
+                }
+                return
+            }
+        }// other 'case' lines to check for other
+        // permissions this app might request
     }
 
     @TargetApi(Build.VERSION_CODES.M)
