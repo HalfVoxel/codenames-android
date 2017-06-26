@@ -21,6 +21,7 @@ import android.widget.Toast
 import android.content.pm.PackageManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.ViewGroup
 import android.widget.ListView
 
 
@@ -52,7 +53,10 @@ class MainActivity : AppCompatActivity() {
         autoCompleteAdapter = ArrayAdapter<String>(this,
                 R.layout.autocomplete_list_item,
                 getResources().getStringArray(R.array.wordlist))
-        board = Board(words, WordType.Red, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+
+        val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
+
+        board = Board(words, WordType.Red, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
 
         val clueListView = findViewById(R.id.clue_list) as RecyclerView
         clueListView.setLayoutManager(LinearLayoutManager(this));
@@ -99,7 +103,7 @@ class MainActivity : AppCompatActivity() {
 
         get_red_clue_button.setOnClickListener { _ ->
             val dialog = ClueDialog()
-            val clue = Clue("THE NETHERLANDS", 3, Team.Red)
+            val clue = Clue("HOT", 3, Team.Red)
             clueList!!.addClue(clue)
             dialog.clue = clue
             dialog.show(getFragmentManager(), "clue")
@@ -158,7 +162,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateBoard(){
-        board = Board(board!!.words, board!!.paintType, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+        val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
+        board = Board(board!!.words, board!!.paintType, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
     }
 
     fun updateLayout(){
@@ -176,18 +181,21 @@ class MainActivity : AppCompatActivity() {
                 instructions.setText(R.string.instructions_enter_words)
                 take_a_photo_layout.visibility = VISIBLE
                 clue_layout.visibility = INVISIBLE
+                remaining_layout.visibility = INVISIBLE
             }
 
             GameState.EnterColors -> {
                 instructions.setText(R.string.instructions_enter_colors)
                 take_a_photo_layout.visibility = VISIBLE
                 clue_layout.visibility = INVISIBLE
+                remaining_layout.visibility = INVISIBLE
             }
 
             GameState.GetClues -> {
                 instructions.setText(R.string.instructions_get_clues)
                 take_a_photo_layout.visibility = INVISIBLE
                 clue_layout.visibility = VISIBLE
+                remaining_layout.visibility = VISIBLE
             }
         }
     }

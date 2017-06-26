@@ -8,19 +8,24 @@ import android.text.TextWatcher
 import android.widget.*
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 
 
 class Board(var words: Array<Array<Word>>,
             var paintType: WordType,
             var layout: TableLayout,
+            val remainingLayout: ViewGroup,
             val autoCompleteAdapter: ArrayAdapter<String>,
             val gameState: GameState,
             val context: Context){
-
     var width: Int = words[0].size
     var height: Int = words.size
     var wordLayouts: Array<Array<LinearLayout>>? = null
     var textViews: Array<Array<TextView>>? = null
+    val redSpiesRemainingView = remainingLayout.findViewById(R.id.red_spies_remaining) as TextView
+    val blueSpiesRemainingView = remainingLayout.findViewById(R.id.blue_spies_remaining) as TextView
+    val civiliansRemainingView = remainingLayout.findViewById(R.id.civilians_remaining) as TextView
+    val assassinsRemainingView = remainingLayout.findViewById(R.id.assassins_remaining) as TextView
 
     init{
 
@@ -112,15 +117,25 @@ class Board(var words: Array<Array<Word>>,
     }
 
     fun updateLayout(){
+        val remainingCount = intArrayOf(0, 0, 0, 0)
         for(r in 0..(height-1)) {
             for (c in 0..(width - 1)) {
                 textViews!![r][c].apply {
+                    if(!words[r][c].contacted) {
+                        remainingCount[words[r][c].type.ordinal]++
+                    }
                     text = words[r][c].word
                     setBackgroundResource(words[r][c].getColor(gameState))
-                    invalidate()
                 }
             }
         }
+        layout.invalidate()
+
+        redSpiesRemainingView.setText(remainingCount[WordType.Red.ordinal].toString())
+        blueSpiesRemainingView.setText(remainingCount[WordType.Blue.ordinal].toString())
+        civiliansRemainingView.setText(remainingCount[WordType.Civilian.ordinal].toString())
+        assassinsRemainingView.setText(remainingCount[WordType.Assassin.ordinal].toString())
+        remainingLayout.invalidate()
     }
 
     fun onSaveInstanceState(outState: Bundle, prefix: String){

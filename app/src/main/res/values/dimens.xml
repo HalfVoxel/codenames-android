@@ -7,4 +7,5 @@
     <dimen name="get_clue_button_padding">20dp</dimen>
     <dimen name="clue_dialog_text_size">32sp</dimen>
     <dimen name="clue_list_text_size">16sp</dimen>
+    <dimen name="remaining_text_size">24sp</dimen>
 </resources>
