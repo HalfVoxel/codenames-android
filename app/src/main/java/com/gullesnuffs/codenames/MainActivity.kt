@@ -2,6 +2,7 @@ package com.gullesnuffs.codenames
 
 import android.annotation.TargetApi
 import android.Manifest
+import android.app.AlertDialog
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
@@ -86,6 +87,18 @@ class MainActivity : AppCompatActivity() {
             board!!.paintType = WordType.Assassin
         }
 
+        get_red_clue_button.setOnClickListener { _ ->
+            val dialog = ClueDialog()
+            dialog.setClue("THE NETHERLANDS", 3, Team.Red)
+            dialog.show(getFragmentManager(), "clue")
+        }
+
+        get_blue_clue_button.setOnClickListener { _ ->
+            val dialog = ClueDialog()
+            dialog.setClue("COLD", 2, Team.Blue)
+            dialog.show(getFragmentManager(), "clue")
+        }
+
         updateLayout()
         
         ActivityCompat.requestPermissions(this,
@@ -148,16 +161,19 @@ class MainActivity : AppCompatActivity() {
             GameState.EnterWords -> {
                 instructions.setText(R.string.instructions_enter_words)
                 take_a_photo_layout.visibility = VISIBLE
+                clue_layout.visibility = INVISIBLE
             }
 
             GameState.EnterColors -> {
                 instructions.setText(R.string.instructions_enter_colors)
                 take_a_photo_layout.visibility = VISIBLE
+                clue_layout.visibility = INVISIBLE
             }
 
             GameState.GetClues -> {
                 instructions.setText(R.string.instructions_get_clues)
                 take_a_photo_layout.visibility = INVISIBLE
+                clue_layout.visibility = VISIBLE
             }
         }
     }

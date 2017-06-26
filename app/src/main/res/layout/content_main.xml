@@ -46,7 +46,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="#FF0000"
+            android:background="@color/red_team_color"
             android:text="Red spy">
         </Button>
         <Button
@@ -54,7 +54,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="#0000FF"
+            android:background="@color/blue_team_color"
             android:text="Blue spy">
         </Button>
         <Button
@@ -62,7 +62,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="#A0A0A0"
+            android:background="@color/civilian_color"
             android:text="Civilian">
         </Button>
         <Button
@@ -70,7 +70,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="#101010"
+            android:background="@color/assassin_color"
             android:text="Assassin">
         </Button>
     </LinearLayout>
@@ -100,6 +100,33 @@
             android:layout_gravity="center_horizontal"
             android:text="Take a photo"
             android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/clue_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/color_picker"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/get_red_clue_button"
+            android:layout_width="@dimen/get_clue_button_width"
+            android:layout_height="wrap_content"
+            android:background="@color/red_team_color"
+            android:layout_marginRight="@dimen/get_clue_button_padding"
+            android:text="Red clue">
+        </Button>
+        <Button
+            android:id="@+id/get_blue_clue_button"
+            android:layout_width="@dimen/get_clue_button_width"
+            android:layout_height="wrap_content"
+            android:background="@color/blue_team_color"
+            android:layout_marginLeft="@dimen/get_clue_button_padding"
+            android:text="Blue clue">
+        </Button>
     </LinearLayout>
 
 

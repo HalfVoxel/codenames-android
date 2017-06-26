@@ -5,4 +5,9 @@
     <color name="colorAccent">#FF4081</color>
     <color name="navigation_enabled">@android:color/holo_green_light</color>
     <color name="navigation_disabled">#B0B0B0</color>
+    <color name="red_team_color">#FF0000</color>
+    <color name="blue_team_color">#0000FF</color>
+    <color name="civilian_color">#C0C0C0</color>
+    <color name="assassin_color">#000000</color>
+    <color name="not_contacted_color">#F0F0F0</color>
 </resources>

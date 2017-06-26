@@ -3,6 +3,11 @@ package com.gullesnuffs.codenames
 import android.graphics.Color
 import android.os.Bundle
 
+enum class Team{
+    Red,
+    Blue
+}
+
 enum class WordType{
     Red,
     Blue,
@@ -25,14 +30,14 @@ class Word(var word: String, var type: WordType, var contacted: Boolean){
     fun getColor(gameState : GameState): Int{
         if(contacted || gameState == GameState.EnterColors) {
             return when (type) {
-                WordType.Red -> Color.RED
-                WordType.Blue -> Color.BLUE
-                WordType.Civilian -> Color.GRAY
-                WordType.Assassin -> Color.BLACK
+                WordType.Red -> R.color.red_team_color
+                WordType.Blue -> R.color.blue_team_color
+                WordType.Civilian -> R.color.civilian_color
+                WordType.Assassin -> R.color.assassin_color
             }
         }
         else{
-            return Color.WHITE;
+            return R.color.not_contacted_color;
         }
     }
 

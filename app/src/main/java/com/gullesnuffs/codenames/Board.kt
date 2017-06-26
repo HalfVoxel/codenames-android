@@ -116,7 +116,7 @@ class Board(var words: Array<Array<Word>>,
             for (c in 0..(width - 1)) {
                 textViews!![r][c].apply {
                     text = words[r][c].word
-                    setBackgroundColor(words[r][c].getColor(gameState))
+                    setBackgroundResource(words[r][c].getColor(gameState))
                     invalidate()
                 }
             }
