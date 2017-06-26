@@ -19,7 +19,9 @@ import android.content.Intent
 import android.support.v4.app.ActivityCompat
 import android.widget.Toast
 import android.content.pm.PackageManager
-
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.widget.ListView
 
 
 enum class GameState {
@@ -31,6 +33,7 @@ enum class GameState {
 class MainActivity : AppCompatActivity() {
 
     var board: Board? = null
+    var clueList: ClueList? = null
     var gameState = GameState.EnterWords
     var autoCompleteAdapter: ArrayAdapter<String>? = null
     var boardLayout: TableLayout? = null
@@ -50,6 +53,13 @@ class MainActivity : AppCompatActivity() {
                 R.layout.autocomplete_list_item,
                 getResources().getStringArray(R.array.wordlist))
         board = Board(words, WordType.Red, boardLayout!!, autoCompleteAdapter!!, gameState, this)
+
+        val clueListView = findViewById(R.id.clue_list) as RecyclerView
+        clueListView.setLayoutManager(LinearLayoutManager(this));
+        clueList = ClueList(clueListView, this)
+        val clueListAdapter = ClueListAdapter(clueList!!, {})
+        clueListView.setAdapter(clueListAdapter);
+
 
         nextGameState.setOnClickListener { _ ->
             if(gameState == GameState.EnterWords){
@@ -89,13 +99,17 @@ class MainActivity : AppCompatActivity() {
 
         get_red_clue_button.setOnClickListener { _ ->
             val dialog = ClueDialog()
-            dialog.clue = Clue("THE NETHERLANDS", 3, Team.Red)
+            val clue = Clue("THE NETHERLANDS", 3, Team.Red)
+            clueList!!.addClue(clue)
+            dialog.clue = clue
             dialog.show(getFragmentManager(), "clue")
         }
 
         get_blue_clue_button.setOnClickListener { _ ->
             val dialog = ClueDialog()
-            dialog.clue = Clue("COLD", 2, Team.Blue)
+            val clue = Clue("COLD", 2, Team.Blue)
+            clueList!!.addClue(clue)
+            dialog.clue = clue
             dialog.show(getFragmentManager(), "clue")
         }
 

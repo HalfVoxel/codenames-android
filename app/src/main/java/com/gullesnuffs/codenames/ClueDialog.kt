@@ -24,15 +24,13 @@ class ClueDialog : DialogFragment() {
         builder.setView(dialogView)
                 .setPositiveButton("OK") { dialog, id -> }
 
-        val color = clue.getColor()
-
         val clueWordView = dialogView.findViewById(R.id.clue_word) as TextView
         clueWordView.setText(clue.word)
-        clueWordView.setTextColor(getResources().getColor(color))
+        clueWordView.setTextColor(getResources().getColor(clue.getColor()))
 
         val clueNumberView = dialogView.findViewById(R.id.clue_number) as TextView
         clueNumberView.setText(clue.number.toString())
-        clueNumberView.setTextColor(getResources().getColor(color))
+        clueNumberView.setTextColor(getResources().getColor(clue.getColor()))
 
         return builder.create()
     }
