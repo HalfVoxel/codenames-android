@@ -89,13 +89,13 @@ class MainActivity : AppCompatActivity() {
 
         get_red_clue_button.setOnClickListener { _ ->
             val dialog = ClueDialog()
-            dialog.setClue("THE NETHERLANDS", 3, Team.Red)
+            dialog.clue = Clue("THE NETHERLANDS", 3, Team.Red)
             dialog.show(getFragmentManager(), "clue")
         }
 
         get_blue_clue_button.setOnClickListener { _ ->
             val dialog = ClueDialog()
-            dialog.setClue("COLD", 2, Team.Blue)
+            dialog.clue = Clue("COLD", 2, Team.Blue)
             dialog.show(getFragmentManager(), "clue")
         }
 
