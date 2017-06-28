@@ -27,4 +27,10 @@ class ClueList(var listView: RecyclerView,
         listView.adapter.notifyItemInserted(newInd)
     }
 
+    fun clear(){
+        var oldSize = list.size
+        list.clear()
+        listView.adapter.notifyItemRangeRemoved(0, oldSize)
+    }
+
 }

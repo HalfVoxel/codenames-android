@@ -4,4 +4,8 @@
     <string name="instructions_enter_words">Enter the words</string>
     <string name="instructions_enter_colors">Color the words</string>
     <string name="instructions_get_clues"></string>
+    <string name="new_game_title">New game</string>
+    <string name="new_game_message">Are you sure you want to start a new game?</string>
+    <string name="new_game_yes">Yes</string>
+    <string name="new_game_no">No</string>
 </resources>

@@ -1,28 +1,30 @@
 package com.gullesnuffs.codenames
 
-import android.annotation.TargetApi
 import android.Manifest
+import android.annotation.TargetApi
 import android.app.AlertDialog
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
+import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
-import kotlinx.android.synthetic.main.activity_main.*
-import android.widget.TableLayout
-import android.widget.ArrayAdapter
-import kotlinx.android.synthetic.main.content_main.*
-import android.content.Intent
-import android.support.v4.app.ActivityCompat
-import android.widget.Toast
-import android.content.pm.PackageManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
-import android.widget.ListView
+import android.widget.ArrayAdapter
+import android.widget.TableLayout
+import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
+import android.content.DialogInterface
+import android.R.string.cancel
+import android.R.string.ok
+
+
 
 
 enum class GameState {
@@ -45,18 +47,18 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         boardLayout = findViewById(R.id.board) as TableLayout
-        val words: Array<Array<Word>> = Array<Array<Word>>(5) {
-            Array<Word>(5){
-                Word("", WordType.Civilian, false)
-            }
-        }
         autoCompleteAdapter = ArrayAdapter<String>(this,
                 R.layout.autocomplete_list_item,
                 getResources().getStringArray(R.array.wordlist))
 
         val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
 
-        board = Board(words, WordType.Red, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
+        val defaultWords = Array<Array<Word>>(5) {
+            Array<Word>(5){
+                Word("", WordType.Civilian, false)
+            }
+        }
+        board = Board(defaultWords, WordType.Red, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
 
         val clueListView = findViewById(R.id.clue_list) as RecyclerView
         clueListView.setLayoutManager(LinearLayoutManager(this));
@@ -215,6 +217,32 @@ class MainActivity : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> true
+            R.id.action_new_game -> {
+                val builder = AlertDialog.Builder(this)
+
+                builder.setMessage(R.string.new_game_message)
+                        .setTitle(R.string.new_game_title)
+                builder.setPositiveButton(R.string.new_game_yes, DialogInterface.OnClickListener { dialog, id ->
+                    val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
+                    val defaultWords = Array<Array<Word>>(5) {
+                        Array<Word>(5){
+                            Word("", WordType.Civilian, false)
+                        }
+                    }
+
+                    board = Board(defaultWords, WordType.Red, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
+                    gameState = GameState.EnterWords
+                    updateLayout()
+                    clueList!!.clear()
+                })
+                builder.setNegativeButton(R.string.new_game_no, DialogInterface.OnClickListener { dialog, id ->
+                    // User cancelled the dialog
+                })
+
+                val dialog = builder.create()
+                dialog.show()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
