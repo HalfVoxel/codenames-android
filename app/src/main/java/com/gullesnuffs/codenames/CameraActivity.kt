@@ -11,6 +11,5 @@ class CameraActivity : Activity() {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(CameraView(this))
-
     }
 }

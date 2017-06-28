@@ -13,5 +13,6 @@
         android:textStyle="bold"
         android:maxLines="1"
         android:inputType="text|textCapCharacters|textPhonetic"
-        android:textSize="@dimen/codeword_text_size"/>
+        android:textSize="@dimen/codeword_text_size"
+        android:imeOptions="actionNext"/>
 </LinearLayout>

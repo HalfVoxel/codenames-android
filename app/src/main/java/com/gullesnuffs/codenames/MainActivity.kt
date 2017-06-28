@@ -23,14 +23,19 @@ import kotlinx.android.synthetic.main.content_main.*
 import android.content.DialogInterface
 import android.R.string.cancel
 import android.R.string.ok
-
-
+import android.app.Activity
+import android.content.Intent
+import android.util.Log
 
 
 enum class GameState {
     EnterWords,
     EnterColors,
     GetClues
+}
+
+enum class RequestCode {
+    WordRecognition
 }
 
 class MainActivity : AppCompatActivity() {
@@ -119,11 +124,11 @@ class MainActivity : AppCompatActivity() {
             dialog.show(getFragmentManager(), "clue")
         }
 
+        take_a_photo.setOnClickListener { _ ->
+            launchCamera()
+        }
+
         updateLayout()
-        
-        ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.CAMERA),
-                1);
     }
     
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -134,8 +139,8 @@ class MainActivity : AppCompatActivity() {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay!
-                    //val i = Intent(this, CameraActivity::class.java)
-                    //startActivity(i)
+                    val i = Intent(this, CameraActivity::class.java)
+                    startActivityForResult(i, RequestCode.WordRecognition.ordinal)
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -146,6 +151,12 @@ class MainActivity : AppCompatActivity() {
             }
         }// other 'case' lines to check for other
         // permissions this app might request
+    }
+
+    fun launchCamera() {
+        ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.CAMERA),
+                1);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -265,6 +276,21 @@ class MainActivity : AppCompatActivity() {
         }
         board!!.updateLayout()
         super.onRestoreInstanceState(inState)
+    }
+
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        when(requestCode) {
+            RequestCode.WordRecognition.ordinal -> if (resultCode == Activity.RESULT_OK) {
+                for(i in 0 until 5){
+                    for(j in 0 until 5){
+                        val key = "word" + i.toString() + "_" + j.toString()
+                        val word = data.extras[key] as String
+                        board!!.words[i][j].word = word
+                    }
+                }
+                board!!.updateLayout()
+            }
+        }
     }
 
     /**

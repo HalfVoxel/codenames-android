@@ -1,9 +1,13 @@
 package com.gullesnuffs.codenames
 
+import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.Intent
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.YuvImage
+import android.net.Uri
 import android.util.Log
 import com.android.volley.*
 import com.android.volley.toolbox.Volley
@@ -59,6 +63,26 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                     // tell everybody you have succed upload image and post strings
                     Log.i("Messsage", message)
                     Log.i("Grid: ", words.toString())
+                    var wordCount = 0
+                    for(row in words){
+                        for(word in row){
+                            if(word.length > 0)
+                                wordCount += 1
+                        }
+                    }
+                    if(wordCount == 25){
+                        val data = Intent()
+                        for(i in 0 until 5){
+                            for(j in 0 until 5){
+                                val key = "word" + i.toString() + "_" + j.toString()
+                                data.putExtra(key, words[i][j])
+                            }
+                        }
+                        data.setData(Uri.parse(""))
+                        var activity = context as Activity
+                        activity.setResult(RESULT_OK, data);
+                        activity.finish()
+                    }
                 } else {
                     Log.i("Unexpected", message)
                 }
