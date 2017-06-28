@@ -182,6 +182,7 @@ class MainActivity : AppCompatActivity() {
                 take_a_photo_layout.visibility = VISIBLE
                 clue_layout.visibility = INVISIBLE
                 remaining_layout.visibility = INVISIBLE
+                clue_list.visibility = INVISIBLE
             }
 
             GameState.EnterColors -> {
@@ -189,6 +190,7 @@ class MainActivity : AppCompatActivity() {
                 take_a_photo_layout.visibility = VISIBLE
                 clue_layout.visibility = INVISIBLE
                 remaining_layout.visibility = INVISIBLE
+                clue_list.visibility = INVISIBLE
             }
 
             GameState.GetClues -> {
@@ -196,6 +198,7 @@ class MainActivity : AppCompatActivity() {
                 take_a_photo_layout.visibility = INVISIBLE
                 clue_layout.visibility = VISIBLE
                 remaining_layout.visibility = VISIBLE
+                clue_list.visibility = VISIBLE
             }
         }
     }
