@@ -64,7 +64,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                             line.add(jsonLine.getString(c))
                         }
                     }
-                    else{
+                    else if(requestCode == RequestCode.GridRecognition){
                         val jsonLine = grid.getString(r)
                         for (c in 0 until jsonLine.length){
                             line.add(jsonLine[c].toString())
@@ -78,13 +78,27 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                     Log.i("Messsage", message)
                     Log.i("Grid: ", words.toString())
                     var wordCount = 0
+                    var countA = 0
+                    var countB = 0
+                    var countC = 0
+                    var countR = 0
                     for(row in words){
                         for(word in row){
                             if(word.length > 0)
                                 wordCount += 1
+                            when(word){
+                                "a" -> countA++
+                                "b" -> countB++
+                                "c" -> countC++
+                                "r" -> countR++
+                            }
                         }
                     }
-                    if(wordCount == 25){
+                    var failed = wordCount < 25
+                    if(requestCode == RequestCode.GridRecognition && (countA == 0 || countC != 7 || countR < 8 || countB < 8)){
+                        failed = true
+                    }
+                    if(!failed){
                         val data = Intent()
                         for(i in 0 until 5){
                             for(j in 0 until 5){
