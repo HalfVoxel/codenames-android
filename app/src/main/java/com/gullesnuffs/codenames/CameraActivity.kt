@@ -10,6 +10,8 @@ class CameraActivity : Activity() {
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(CameraView(this))
+        val cameraView = CameraView(this)
+        cameraView.requestCode = getIntent().extras["RequestCode"] as RequestCode
+        setContentView(cameraView)
     }
 }

@@ -22,6 +22,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
     var previousRequestDone = true
     var lastUploadTime : DateTime = DateTime.now()
     val requestQueue : RequestQueue = Volley.newRequestQueue(context)
+    var requestCode : RequestCode? = null
 
     override fun processFrame(data: ByteArray) {
         if (lastUploadTime.plusMillis(1000).isBeforeNow() && previousRequestDone) {
@@ -37,13 +38,18 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
         yuv.compressToJpeg(Rect(0, 0, frameWidth, frameHeight), 70, jpeg)
         val imageData = jpeg.toByteArray()
 
-        val url = "https://judge.omogenheap.se/codenames/api/1/ocr-board"
+        val url =
+                if(requestCode == RequestCode.WordRecognition)
+                    "https://judge.omogenheap.se/codenames/api/1/ocr-board"
+                else
+                    "https://judge.omogenheap.se/codenames/api/1/ocr-grid"
         previousRequestDone = false
         val multipartRequest = object : VolleyMultipartRequest(Request.Method.POST, url, Response.Listener<NetworkResponse>
         {
             response ->
             previousRequestDone = true
             val resultResponse = String(response.data)
+            Log.d("Result", resultResponse)
             try {
                 val result = JSONObject(resultResponse)
                 val status = result.getString("status")
@@ -52,9 +58,17 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                 val words = ArrayList<ArrayList<String>>()
                 for (r in 0 until grid.length()) {
                     val line = ArrayList<String>()
-                    val jsonLine = grid.getJSONArray(r)
-                    for (c in 0 until jsonLine.length()) {
-                        line.add(jsonLine.getString(c))
+                    if(requestCode == RequestCode.WordRecognition) {
+                        val jsonLine = grid.getJSONArray(r)
+                        for (c in 0 until jsonLine.length()) {
+                            line.add(jsonLine.getString(c))
+                        }
+                    }
+                    else{
+                        val jsonLine = grid.getString(r)
+                        for (c in 0 until jsonLine.length){
+                            line.add(jsonLine[c].toString())
+                        }
                     }
                     words.add(line)
                 }

@@ -26,6 +26,7 @@ import android.R.string.ok
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.gullesnuffs.codenames.R.layout.word
 
 
 enum class GameState {
@@ -35,7 +36,8 @@ enum class GameState {
 }
 
 enum class RequestCode {
-    WordRecognition
+    WordRecognition,
+    GridRecognition
 }
 
 class MainActivity : AppCompatActivity() {
@@ -140,7 +142,9 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay!
                     val i = Intent(this, CameraActivity::class.java)
-                    startActivityForResult(i, RequestCode.WordRecognition.ordinal)
+                    val requestCode = if(gameState == GameState.EnterWords) RequestCode.WordRecognition else RequestCode.GridRecognition
+                    i.putExtra("RequestCode", requestCode)
+                    startActivityForResult(i, requestCode.ordinal)
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -286,6 +290,29 @@ class MainActivity : AppCompatActivity() {
                         val key = "word" + i.toString() + "_" + j.toString()
                         val word = data.extras[key] as String
                         board!!.words[i][j].word = word
+                    }
+                }
+                board!!.updateLayout()
+            }
+
+            RequestCode.GridRecognition.ordinal -> if (resultCode == Activity.RESULT_OK) {
+                for(i in 0 until 5){
+                    for(j in 0 until 5){
+                        val key = "word" + i.toString() + "_" + j.toString()
+                        val character = data.extras[key] as String
+                        val wordType : WordType? =
+                            when(character){
+                                "a" -> WordType.Assassin
+                                "c" -> WordType.Civilian
+                                "b" -> WordType.Blue
+                                "r" -> WordType.Red
+                                else -> {
+                                    null
+                                }
+                            }
+                        if(wordType != null) {
+                            board!!.words[i][j].type = wordType
+                        }
                     }
                 }
                 board!!.updateLayout()
