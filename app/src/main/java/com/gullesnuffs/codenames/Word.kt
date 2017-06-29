@@ -41,6 +41,15 @@ class Word(var word: String, var type: WordType, var contacted: Boolean){
         }
     }
 
+    fun getColorCode(): String{
+        return when (type) {
+            WordType.Red -> "r"
+            WordType.Blue -> "b"
+            WordType.Civilian -> "c"
+            WordType.Assassin -> "a"
+        }
+    }
+
     fun onSaveInstanceState(outState: Bundle, prefix: String){
         outState.putString(prefix + "_word", word)
         outState.putString(prefix + "_type", type.toString())

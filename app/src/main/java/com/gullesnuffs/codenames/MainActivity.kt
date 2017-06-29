@@ -26,6 +26,8 @@ import android.R.string.ok
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.Volley
 import com.gullesnuffs.codenames.R.layout.word
 
 
@@ -47,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     var gameState = GameState.EnterWords
     var autoCompleteAdapter: ArrayAdapter<String>? = null
     var boardLayout: TableLayout? = null
+    var requestQueue : RequestQueue? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         val clueListAdapter = ClueListAdapter(clueList!!, {})
         clueListView.setAdapter(clueListAdapter);
 
+        requestQueue = Volley.newRequestQueue(this)
 
         nextGameState.setOnClickListener { _ ->
             if(gameState == GameState.EnterWords){
@@ -111,19 +115,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         get_red_clue_button.setOnClickListener { _ ->
-            val dialog = ClueDialog()
-            val clue = Clue("HOT", 3, Team.Red)
-            clueList!!.addClue(clue)
-            dialog.clue = clue
-            dialog.show(getFragmentManager(), "clue")
+            val bot = Bot()
+            bot.init(board!!)
+            bot.getClue(Team.Red, requestQueue!!, { clue: Clue ->
+                val dialog = ClueDialog()
+                clueList!!.addClue(clue)
+                dialog.clue = clue
+                dialog.show(getFragmentManager(), "clue")
+            })
         }
 
         get_blue_clue_button.setOnClickListener { _ ->
-            val dialog = ClueDialog()
-            val clue = Clue("COLD", 2, Team.Blue)
-            clueList!!.addClue(clue)
-            dialog.clue = clue
-            dialog.show(getFragmentManager(), "clue")
+            val bot = Bot()
+            bot.init(board!!)
+            bot.getClue(Team.Blue, requestQueue!!, { clue: Clue ->
+                val dialog = ClueDialog()
+                clueList!!.addClue(clue)
+                dialog.clue = clue
+                dialog.show(getFragmentManager(), "clue")
+            })
         }
 
         take_a_photo.setOnClickListener { _ ->
