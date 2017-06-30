@@ -73,7 +73,6 @@ class Board(var words: Array<Array<Word>>,
                             }
                         }
                         textView.setFilters(newFilters)
-
                         textView.addTextChangedListener(object : TextWatcher {
                             override fun beforeTextChanged(s: CharSequence?,
                                                            start: Int, count: Int, after: Int) {
@@ -113,7 +112,21 @@ class Board(var words: Array<Array<Word>>,
             }
         }
 
+        initializeFocus(textViews!!)
         updateLayout()
+    }
+
+    fun initializeFocus(textViews : Array<Array<TextView>>) {
+        val flat = textViews.flatten()
+        for (textView in flat) {
+            textView.id = View.generateViewId()
+        }
+
+        flat.forEachIndexed { index, textView ->
+            if (index + 1 < flat.size) {
+                textView.nextFocusDownId = flat[index+1].id
+            }
+        }
     }
 
     fun updateLayout(){
