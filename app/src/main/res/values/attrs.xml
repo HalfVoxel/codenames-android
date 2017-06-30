@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="none" format="boolean" />
+    <attr name="red" format="boolean" />
+    <attr name="blue" format="boolean" />
+    <attr name="civilian" format="boolean" />
+    <attr name="assassin" format="boolean" />
+</resources>

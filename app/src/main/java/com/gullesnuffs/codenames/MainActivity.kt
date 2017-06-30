@@ -21,14 +21,11 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import android.content.DialogInterface
-import android.R.string.cancel
-import android.R.string.ok
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
-import com.gullesnuffs.codenames.R.layout.word
 
 
 enum class GameState {

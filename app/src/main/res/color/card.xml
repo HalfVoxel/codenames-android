@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item app:civilian="true" android:color="@color/civilian_color" />
+    <item app:blue="true" android:color="@color/blue_team_color" />
+    <item app:red="true" android:color="@color/red_team_color" />
+    <item app:assassin="true" android:color="@color/assassin_color" />
+</selector>

@@ -1,6 +1,9 @@
 package com.gullesnuffs.codenames
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -17,158 +20,115 @@ class Board(var words: Array<Array<Word>>,
             val remainingLayout: ViewGroup,
             val autoCompleteAdapter: ArrayAdapter<String>,
             val gameState: GameState,
-            val context: Context){
+            val context: Context) {
     var width: Int = words[0].size
     var height: Int = words.size
-    var wordLayouts: Array<Array<LinearLayout>>? = null
-    var textViews: Array<Array<TextView>>? = null
+    val cards = ArrayList<Card>()
     val redSpiesRemainingView = remainingLayout.findViewById(R.id.red_spies_remaining) as TextView
     val blueSpiesRemainingView = remainingLayout.findViewById(R.id.blue_spies_remaining) as TextView
     val civiliansRemainingView = remainingLayout.findViewById(R.id.civilians_remaining) as TextView
     val assassinsRemainingView = remainingLayout.findViewById(R.id.assassins_remaining) as TextView
 
-    init{
-
+    init {
+        System.out.println("0")
         val inflater = LayoutInflater.from(context)
 
         layout.removeAllViews()
 
-        wordLayouts = Array<Array<LinearLayout>>(height)
-        {
-            i ->
-            val row : TableRow = TableRow(context)
+        System.out.println("A")
+
+        for (i in 0 until height) {
+            val row: TableRow = TableRow(context)
             layout.addView(row)
-            Array<LinearLayout>(width) {
-                j ->
-                if(gameState == GameState.EnterWords) {
-                    inflater.inflate(R.layout.editable_word, row)
-                }
-                else{
-                    inflater.inflate(R.layout.word, row)
-                }
-                row.getChildAt(j) as LinearLayout
+            for (j in 0 until width) {
+                inflater.inflate(R.layout.editable_word, row)
+                val card = (row.getChildAt(j) as LinearLayout).getChildAt(0) as Card
+                cards.add(card)
             }
         }
 
-        textViews = Array<Array<TextView>>(height)
-        {
-            i -> Array<TextView>(width)
-            {
-                j ->
-                val wordLayout = wordLayouts!![i][j]
-                val firstChild = wordLayout.getChildAt(0)
-                when(gameState) {
-                    GameState.EnterWords -> {
-                        val textView: AutoCompleteTextView = firstChild as AutoCompleteTextView
-                        textView.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
-
-                        val editFilters = textView.getFilters()
-                        val newFilters = Array<InputFilter>(editFilters.size + 1) {
-                            i ->
-                            if(i < editFilters.size){
-                                editFilters[i]
-                            }
-                            else{
-                                InputFilter.AllCaps()
-                            }
-                        }
-                        textView.setFilters(newFilters)
-                        textView.addTextChangedListener(object : TextWatcher {
-                            override fun beforeTextChanged(s: CharSequence?,
-                                                           start: Int, count: Int, after: Int) {
-                            }
-
-                            override fun afterTextChanged(s: Editable?) {
-                            }
-
-                            override fun onTextChanged(s: CharSequence?,
-                                                       start: Int, before: Int, count: Int) {
-                                words[i][j].word = s.toString()
-                            }
-                        })
-                        textView
+        System.out.println("B")
+        cards.zip(words.flatten()).forEach { (card, word) ->
+            val parent = card.parent as ViewGroup
+            when (gameState) {
+                GameState.EnterWords -> {
+                    card.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
+                    card.onChanged = { s -> word.word = s }
+                    card.editable = true
+                }
+                GameState.EnterColors -> {
+                    parent.setOnClickListener { _ ->
+                        word.type = paintType
+                        updateLayout()
                     }
-                    GameState.EnterColors -> {
-                        wordLayout.setOnClickListener(object: View.OnClickListener {
-                            override fun onClick(view: View): Unit {
-                                words[i][j].type = paintType
-                                updateLayout()
-                            }
-                        })
-                        val textView: TextView = firstChild as TextView
-                        textView
+                    card.editable = false
+                }
+                GameState.GetClues -> {
+                    parent.setOnClickListener { _ ->
+                        word.contacted = !word.contacted
+                        updateLayout()
                     }
-                    GameState.GetClues -> {
-                        wordLayout.setOnClickListener(object: View.OnClickListener {
-                            override fun onClick(view: View): Unit {
-                                words[i][j].contacted = !words[i][j].contacted
-                                updateLayout()
-                            }
-                        })
-                        val textView: TextView = firstChild as TextView
-                        textView
-                    }
+                    card.editable = false
                 }
             }
         }
 
-        initializeFocus(textViews!!)
+        initializeFocus(cards)
         updateLayout()
     }
 
-    fun initializeFocus(textViews : Array<Array<TextView>>) {
-        val flat = textViews.flatten()
-        for (textView in flat) {
+    fun initializeFocus(textViews: ArrayList<Card>) {
+        for (textView in textViews) {
             textView.id = View.generateViewId()
         }
 
-        flat.forEachIndexed { index, textView ->
-            if (index + 1 < flat.size) {
-                textView.nextFocusDownId = flat[index+1].id
+        textViews.forEachIndexed { index, textView ->
+            if (index + 1 < textViews.size) {
+                textView.nextFocusDownId = textViews[index + 1].id
             }
         }
     }
 
-    fun updateLayout(){
+    fun updateLayout() {
         val remainingCount = intArrayOf(0, 0, 0, 0)
-        for(r in 0..(height-1)) {
-            for (c in 0..(width - 1)) {
-                textViews!![r][c].apply {
-                    if(!words[r][c].contacted) {
-                        remainingCount[words[r][c].type.ordinal]++
-                    }
-                    text = words[r][c].word
-                    setBackgroundResource(words[r][c].getColor(gameState))
-                }
+        cards.zip(words.flatten()).forEach { (card, word) ->
+            if (!word.contacted) {
+                remainingCount[word.type.ordinal]++
             }
+
+            (card as TextView).text = word.word
+            card.state = word.type
         }
+
         layout.invalidate()
 
-        redSpiesRemainingView.setText(remainingCount[WordType.Red.ordinal].toString())
-        blueSpiesRemainingView.setText(remainingCount[WordType.Blue.ordinal].toString())
-        civiliansRemainingView.setText(remainingCount[WordType.Civilian.ordinal].toString())
-        assassinsRemainingView.setText(remainingCount[WordType.Assassin.ordinal].toString())
+        redSpiesRemainingView.text = remainingCount[WordType.Red.ordinal].toString()
+        blueSpiesRemainingView.text = remainingCount[WordType.Blue.ordinal].toString()
+        civiliansRemainingView.text = remainingCount[WordType.Civilian.ordinal].toString()
+        assassinsRemainingView.text = remainingCount[WordType.Assassin.ordinal].toString()
         remainingLayout.invalidate()
     }
 
-    fun onSaveInstanceState(outState: Bundle, prefix: String){
+    fun onSaveInstanceState(outState: Bundle, prefix: String) {
         outState.putInt(prefix + "_width", width)
         outState.putInt(prefix + "_height", height)
         outState.putString(prefix + "_paint_type", paintType.toString())
-        for(i in 0 until width) {
+        for (i in 0 until width) {
             for (j in 0 until height) {
                 words[i][j].onSaveInstanceState(outState, prefix + "_word_" + i + "_" + j);
             }
         }
     }
 
-    fun onRestoreInstanceState(inState: Bundle, prefix: String){
+    fun onRestoreInstanceState(inState: Bundle, prefix: String) {
         width = inState.getInt(prefix + "_width")
         height = inState.getInt(prefix + "_height")
         paintType = WordType.valueOf(inState.getString(prefix + "_paint_type"))
         words = Array<Array<Word>>(height) {
-            i -> Array<Word>(width) {
-                j -> Word(inState, prefix + "_word_" + i + "_" + j)
+            i ->
+            Array<Word>(width) {
+                j ->
+                Word(inState, prefix + "_word_" + i + "_" + j)
             }
         }
     }
