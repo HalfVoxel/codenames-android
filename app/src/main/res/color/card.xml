@@ -4,4 +4,5 @@
     <item app:blue="true" android:color="@color/blue_team_color" />
     <item app:red="true" android:color="@color/red_team_color" />
     <item app:assassin="true" android:color="@color/assassin_color" />
+    <item android:color="@color/main_background" />
 </selector>

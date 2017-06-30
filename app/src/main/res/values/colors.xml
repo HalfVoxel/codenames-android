@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#b71c1c</color>
+    <color name="colorPrimaryDark">#801313</color>
     <color name="colorAccent">#CCCCCC</color>
-    <color name="navigation_enabled">@android:color/holo_green_light</color>
-    <color name="navigation_disabled">#B0B0B0</color>
+    <color name="navigation_enabled">#801313</color>
+    <color name="navigation_disabled">#7c4f4f</color>
     <color name="red_team_color">#e41a1c</color>
     <color name="blue_team_color">#377eb8</color>
-    <color name="civilian_color">#696969</color>
+    <color name="civilian_color">#616161</color>
     <color name="assassin_color">#000000</color>
     <color name="not_contacted_color">#F0F0F0</color>
-    <color name="main_background">#222222</color>
+    <color name="main_background">#212121</color>
 </resources>

@@ -22,22 +22,15 @@
 
     <include layout="@layout/content_main" />
 
-    <android.support.design.widget.FloatingActionButton
+    <Button
         android:id="@+id/nextGameState"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@color/navigation_disabled"
-        app:srcCompat="@drawable/ic_arrow_forward_black_24dp" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/previousGameState"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|left"
-        android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@color/navigation_disabled"
-        app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
+        android:layout_gravity="center_horizontal|bottom"
+        android:text="Done"
+        android:drawableRight="@drawable/ic_check_white_24dp"
+        android:layout_marginBottom="50dp"
+        app:backgroundTint="@color/navigation_enabled"
+        />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -30,12 +30,9 @@ class Board(var words: Array<Array<Word>>,
     //val assassinsRemainingView = remainingLayout.findViewById(R.id.assassins_remaining) as TextView
 
     init {
-        System.out.println("0")
         val inflater = LayoutInflater.from(context)
 
         layout.removeAllViews()
-
-        System.out.println("A")
 
         for (i in 0 until height) {
             val row: TableRow = TableRow(context)
@@ -47,7 +44,6 @@ class Board(var words: Array<Array<Word>>,
             }
         }
 
-        System.out.println("B")
         cards.zip(words.flatten()).forEach { (card, word) ->
             val parent = card.parent as ViewGroup
             when (gameState) {
@@ -97,7 +93,11 @@ class Board(var words: Array<Array<Word>>,
             }
 
             (card as TextView).text = word.word
-            card.state = word.type
+            if (gameState == GameState.GetClues) {
+                card.state = if (word.contacted) word.type else null
+            } else {
+                card.state = word.type
+            }
         }
 
         layout.invalidate()

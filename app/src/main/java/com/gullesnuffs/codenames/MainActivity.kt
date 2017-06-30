@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     var gameState = GameState.EnterWords
     var autoCompleteAdapter: ArrayAdapter<String>? = null
     var boardLayout: TableLayout? = null
-    var requestQueue : RequestQueue? = null
+    var requestQueue: RequestQueue? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,41 +56,30 @@ class MainActivity : AppCompatActivity() {
         boardLayout = findViewById(R.id.board) as TableLayout
         autoCompleteAdapter = ArrayAdapter<String>(this,
                 R.layout.autocomplete_list_item,
-                getResources().getStringArray(R.array.wordlist))
+                resources.getStringArray(R.array.wordlist))
 
         val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
 
-        val defaultWords = Array<Array<Word>>(5) {
-            Array<Word>(5){
+        val defaultWords = Array(5) {
+            Array(5) {
                 Word("", WordType.Civilian, false)
             }
         }
         board = Board(defaultWords, WordType.Red, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
 
         val clueListView = findViewById(R.id.clue_list) as RecyclerView
-        clueListView.setLayoutManager(LinearLayoutManager(this));
+        clueListView.layoutManager = LinearLayoutManager(this);
         clueList = ClueList(clueListView, this)
         val clueListAdapter = ClueListAdapter(clueList!!, {})
-        clueListView.setAdapter(clueListAdapter);
+        clueListView.adapter = clueListAdapter;
 
         requestQueue = Volley.newRequestQueue(this)
 
         nextGameState.setOnClickListener { _ ->
-            if(gameState == GameState.EnterWords){
+            if (gameState == GameState.EnterWords) {
                 gameState = GameState.EnterColors
-            }
-            else if(gameState == GameState.EnterColors){
+            } else if (gameState == GameState.EnterColors) {
                 gameState = GameState.GetClues
-            }
-            updateLayout()
-        }
-
-        previousGameState.setOnClickListener { _ ->
-            if(gameState == GameState.EnterColors){
-                gameState = GameState.EnterWords
-            }
-            else if(gameState == GameState.GetClues){
-                gameState = GameState.EnterColors
             }
             updateLayout()
         }
@@ -137,7 +126,18 @@ class MainActivity : AppCompatActivity() {
 
         updateLayout()
     }
-    
+
+    override fun onBackPressed() {
+        if (gameState == GameState.EnterColors) {
+            gameState = GameState.EnterWords
+        } else if (gameState == GameState.GetClues) {
+            gameState = GameState.EnterColors
+        } else {
+            super.onBackPressed()
+        }
+        updateLayout()
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay!
                     val i = Intent(this, CameraActivity::class.java)
-                    val requestCode = if(gameState == GameState.EnterWords) RequestCode.WordRecognition else RequestCode.GridRecognition
+                    val requestCode = if (gameState == GameState.EnterWords) RequestCode.WordRecognition else RequestCode.GridRecognition
                     i.putExtra("RequestCode", requestCode)
                     startActivityForResult(i, requestCode.ordinal)
                 } else {
@@ -169,36 +169,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    fun updateNavigationButtons(){
-        val forwardColor = if(gameState == GameState.GetClues) R.color.navigation_disabled else R.color.navigation_enabled
-        nextGameState.setBackgroundTintList(getResources().getColorStateList(
-                forwardColor,
-                getTheme()))
-        nextGameState.invalidate()
-
-        val backColor = if(gameState == GameState.EnterWords) R.color.navigation_disabled else R.color.navigation_enabled
-        previousGameState.setBackgroundTintList(getResources().getColorStateList(
-                backColor,
-                getTheme()))
-        nextGameState.invalidate()
+    fun updateNavigationButtons() {
+        nextGameState.visibility = if(gameState == GameState.GetClues) INVISIBLE else VISIBLE
     }
 
-    fun updateBoard(){
+    fun updateBoard() {
         val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
         board = Board(board!!.words, board!!.paintType, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
     }
 
-    fun updateLayout(){
+    fun updateLayout() {
         updateNavigationButtons()
         updateBoard()
 
-        val colorPickerVisibility = if(gameState == GameState.EnterColors) VISIBLE else INVISIBLE
+        val colorPickerVisibility = if (gameState == GameState.EnterColors) VISIBLE else INVISIBLE
         place_red_spy_button.visibility = colorPickerVisibility
         place_blue_spy_button.visibility = colorPickerVisibility
         place_civilian_button.visibility = colorPickerVisibility
         place_assassin_button.visibility = colorPickerVisibility
 
-        when(gameState){
+        when (gameState) {
             GameState.EnterWords -> {
                 instructions.setText(R.string.instructions_enter_words)
                 take_a_photo_layout.visibility = VISIBLE
@@ -245,7 +235,7 @@ class MainActivity : AppCompatActivity() {
                 builder.setPositiveButton(R.string.new_game_yes, DialogInterface.OnClickListener { dialog, id ->
                     val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
                     val defaultWords = Array<Array<Word>>(5) {
-                        Array<Word>(5){
+                        Array<Word>(5) {
                             Word("", WordType.Civilian, false)
                         }
                     }
@@ -268,18 +258,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     // invoked when the activity may be temporarily destroyed, save the instance state here
-    override fun onSaveInstanceState(outState: Bundle)
-    {
+    override fun onSaveInstanceState(outState: Bundle) {
         outState.putString("game_state", gameState.toString());
         board?.onSaveInstanceState(outState, "board")
         super.onSaveInstanceState(outState);
     }
 
-    override fun onRestoreInstanceState(inState: Bundle)
-    {
+    override fun onRestoreInstanceState(inState: Bundle) {
         val newGameState = GameState.valueOf(inState.getString("game_state"))
         board!!.onRestoreInstanceState(inState, "board")
-        if(newGameState != gameState){
+        if (newGameState != gameState) {
             gameState = GameState.valueOf(inState.getString("game_state"))
             updateLayout()
         }
@@ -287,40 +275,43 @@ class MainActivity : AppCompatActivity() {
         super.onRestoreInstanceState(inState)
     }
 
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        when(requestCode) {
-            RequestCode.WordRecognition.ordinal -> if (resultCode == Activity.RESULT_OK) {
-                for(i in 0 until 5){
-                    for(j in 0 until 5){
-                        val key = "word" + i.toString() + "_" + j.toString()
-                        val word = data.extras[key] as String
-                        board!!.words[i][j].word = word
-                    }
-                }
-                board!!.updateLayout()
-            }
-
-            RequestCode.GridRecognition.ordinal -> if (resultCode == Activity.RESULT_OK) {
-                for(i in 0 until 5){
-                    for(j in 0 until 5){
-                        val key = "word" + i.toString() + "_" + j.toString()
-                        val character = data.extras[key] as String
-                        val wordType : WordType? =
-                            when(character){
-                                "a" -> WordType.Assassin
-                                "c" -> WordType.Civilian
-                                "b" -> WordType.Blue
-                                "r" -> WordType.Red
-                                else -> {
-                                    null
-                                }
-                            }
-                        if(wordType != null) {
-                            board!!.words[i][j].type = wordType
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            RequestCode.WordRecognition.ordinal -> {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    for (i in 0 until 5) {
+                        for (j in 0 until 5) {
+                            val key = "word" + i.toString() + "_" + j.toString()
+                            val word = data.extras[key] as String
+                            board!!.words[i][j].word = word
                         }
                     }
+                    board!!.updateLayout()
                 }
-                board!!.updateLayout()
+            }
+            RequestCode.GridRecognition.ordinal -> {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    for (i in 0 until 5) {
+                        for (j in 0 until 5) {
+                            val key = "word" + i.toString() + "_" + j.toString()
+                            val character = data.extras[key] as String
+                            val wordType: WordType? =
+                                    when (character) {
+                                        "a" -> WordType.Assassin
+                                        "c" -> WordType.Civilian
+                                        "b" -> WordType.Blue
+                                        "r" -> WordType.Red
+                                        else -> {
+                                            null
+                                        }
+                                    }
+                            if (wordType != null) {
+                                board!!.words[i][j].type = wordType
+                            }
+                        }
+                    }
+                    board!!.updateLayout()
+                }
             }
         }
     }
