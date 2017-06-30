@@ -15,6 +15,7 @@
         android:layout_height="19dp"
         android:text="@string/instructions_enter_words"
         android:layout_marginTop="8dp"
+        android:textColor="#FFFFFF"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -46,33 +47,37 @@
         <Button
             android:id="@+id/place_red_spy_button"
             android:layout_width="0dp"
+            android:textSize="15dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/red_team_color"
+            android:backgroundTint="@color/red_team_color"
             android:text="Red spy">
         </Button>
         <Button
             android:id="@+id/place_blue_spy_button"
             android:layout_width="0dp"
+            android:textSize="15dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/blue_team_color"
+            android:backgroundTint="@color/blue_team_color"
             android:text="Blue spy">
         </Button>
         <Button
             android:id="@+id/place_civilian_button"
             android:layout_width="0dp"
+            android:textSize="15dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/civilian_color"
+            android:backgroundTint="@color/civilian_color"
             android:text="Civilian">
         </Button>
         <Button
             android:id="@+id/place_assassin_button"
             android:layout_width="0dp"
+            android:textSize="15dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/assassin_color"
+            android:backgroundTint="@color/assassin_color"
             android:text="Assassin">
         </Button>
     </LinearLayout>
@@ -97,16 +102,6 @@
             android:text="9">
         </TextView>
         <TextView
-            android:id="@+id/blue_spies_remaining"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:textSize="@dimen/remaining_text_size"
-            android:textColor="@color/blue_team_color"
-            android:text="8">
-        </TextView>
-        <TextView
             android:id="@+id/civilians_remaining"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -117,14 +112,14 @@
             android:text="7">
         </TextView>
         <TextView
-            android:id="@+id/assassins_remaining"
+            android:id="@+id/blue_spies_remaining"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:textSize="@dimen/remaining_text_size"
-            android:textColor="@color/assassin_color"
-            android:text="1">
+            android:textColor="@color/blue_team_color"
+            android:text="8">
         </TextView>
     </LinearLayout>
 
@@ -169,7 +164,7 @@
             android:id="@+id/get_red_clue_button"
             android:layout_width="@dimen/get_clue_button_width"
             android:layout_height="wrap_content"
-            android:background="@color/red_team_color"
+            android:backgroundTint="@color/red_team_color"
             android:layout_marginRight="@dimen/get_clue_button_padding"
             android:text="Red clue">
         </Button>
@@ -177,7 +172,7 @@
             android:id="@+id/get_blue_clue_button"
             android:layout_width="@dimen/get_clue_button_width"
             android:layout_height="wrap_content"
-            android:background="@color/blue_team_color"
+            android:backgroundTint="@color/blue_team_color"
             android:layout_marginLeft="@dimen/get_clue_button_padding"
             android:text="Blue clue">
         </Button>

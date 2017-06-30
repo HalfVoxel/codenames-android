@@ -27,7 +27,7 @@ class Board(var words: Array<Array<Word>>,
     val redSpiesRemainingView = remainingLayout.findViewById(R.id.red_spies_remaining) as TextView
     val blueSpiesRemainingView = remainingLayout.findViewById(R.id.blue_spies_remaining) as TextView
     val civiliansRemainingView = remainingLayout.findViewById(R.id.civilians_remaining) as TextView
-    val assassinsRemainingView = remainingLayout.findViewById(R.id.assassins_remaining) as TextView
+    //val assassinsRemainingView = remainingLayout.findViewById(R.id.assassins_remaining) as TextView
 
     init {
         System.out.println("0")
@@ -105,7 +105,7 @@ class Board(var words: Array<Array<Word>>,
         redSpiesRemainingView.text = remainingCount[WordType.Red.ordinal].toString()
         blueSpiesRemainingView.text = remainingCount[WordType.Blue.ordinal].toString()
         civiliansRemainingView.text = remainingCount[WordType.Civilian.ordinal].toString()
-        assassinsRemainingView.text = remainingCount[WordType.Assassin.ordinal].toString()
+        //assassinsRemainingView.text = remainingCount[WordType.Assassin.ordinal].toString()
         remainingLayout.invalidate()
     }
 

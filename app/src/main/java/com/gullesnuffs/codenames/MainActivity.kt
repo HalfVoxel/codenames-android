@@ -112,8 +112,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         get_red_clue_button.setOnClickListener { _ ->
-            val bot = Bot()
-            bot.init(board!!)
+            val bot = Bot(board!!)
             bot.getClue(Team.Red, requestQueue!!, { clue: Clue ->
                 val dialog = ClueDialog()
                 clueList!!.addClue(clue)
@@ -123,8 +122,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         get_blue_clue_button.setOnClickListener { _ ->
-            val bot = Bot()
-            bot.init(board!!)
+            val bot = Bot(board!!)
             bot.getClue(Team.Blue, requestQueue!!, { clue: Clue ->
                 val dialog = ClueDialog()
                 clueList!!.addClue(clue)
