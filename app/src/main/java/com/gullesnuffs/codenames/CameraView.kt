@@ -23,6 +23,8 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
     var lastUploadTime : DateTime = DateTime.now()
     val requestQueue : RequestQueue = Volley.newRequestQueue(context)
     var requestCode : RequestCode? = null
+    var savedWords: ArrayList<ArrayList<String>>? = null
+    var savedWordsCount: Int = 0
 
     override fun processFrame(data: ByteArray) {
         if (lastUploadTime.plusMillis(1000).isBeforeNow() && previousRequestDone) {
@@ -94,22 +96,16 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                             }
                         }
                     }
+                    if(wordCount > savedWordsCount) {
+                        savedWords = words
+                        savedWordsCount = wordCount
+                    }
                     var failed = wordCount < 25
                     if(requestCode == RequestCode.GridRecognition && (countA != 1 || countC != 7 || countR < 8 || countB < 8)){
                         failed = true
                     }
                     if(!failed){
-                        val data = Intent()
-                        for(i in 0 until 5){
-                            for(j in 0 until 5){
-                                val key = "word" + i.toString() + "_" + j.toString()
-                                data.putExtra(key, words[i][j])
-                            }
-                        }
-                        data.setData(Uri.parse(""))
-                        var activity = context as Activity
-                        activity.setResult(RESULT_OK, data);
-                        activity.finish()
+                        sendData(words)
                     }
                 } else {
                     Log.i("Unexpected", message)
@@ -143,5 +139,19 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
         }
 
         requestQueue.add(multipartRequest)
+    }
+
+    fun sendData(words: ArrayList<ArrayList<String>>){
+        val data = Intent()
+        for(i in 0 until 5){
+            for(j in 0 until 5){
+                val key = "word" + i.toString() + "_" + j.toString()
+                data.putExtra(key, words[i][j])
+            }
+        }
+        data.setData(Uri.parse(""))
+        var activity = context as Activity
+        activity.setResult(RESULT_OK, data);
+        activity.finish()
     }
 }
