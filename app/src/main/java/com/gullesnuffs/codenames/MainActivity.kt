@@ -310,6 +310,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     board!!.updateLayout()
+                    nextGameState.requestFocus()
                 }
             }
             RequestCode.GridRecognition.ordinal -> {
