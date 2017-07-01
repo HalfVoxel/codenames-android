@@ -9,7 +9,7 @@ class ClueList(var listView: RecyclerView,
                val context: Context) {
     val list = mutableListOf<Clue>()
 
-    fun addClue(clue: Clue){
+    fun addClue(clue: Clue) {
         list.add(0, clue)
 
         val inflater = LayoutInflater.from(context)
@@ -27,7 +27,7 @@ class ClueList(var listView: RecyclerView,
         listView.scrollToPosition(0);
     }
 
-    fun clear(){
+    fun clear() {
         var oldSize = list.size
         list.clear()
         listView.adapter.notifyItemRangeRemoved(0, oldSize)

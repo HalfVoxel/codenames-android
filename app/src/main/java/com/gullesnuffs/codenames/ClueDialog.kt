@@ -9,11 +9,11 @@ import android.widget.TextView
 
 class ClueDialog : DialogFragment() {
 
-    var clue : Clue = Clue("CLUE", 0, Team.Red)
+    var clue: Clue = Clue("CLUE", 0, Team.Red)
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        if(savedInstanceState != null)
+        if (savedInstanceState != null)
             clue.onRestoreInstanceState(savedInstanceState, "clue")
 
         val builder = AlertDialog.Builder(activity)
@@ -35,8 +35,7 @@ class ClueDialog : DialogFragment() {
         return builder.create()
     }
 
-    override fun onSaveInstanceState(outState: Bundle)
-    {
+    override fun onSaveInstanceState(outState: Bundle) {
         clue.onSaveInstanceState(outState, "clue")
         super.onSaveInstanceState(outState);
     }

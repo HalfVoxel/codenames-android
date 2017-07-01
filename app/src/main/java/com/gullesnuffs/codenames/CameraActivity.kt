@@ -19,10 +19,9 @@ class CameraActivity : Activity() {
 
     override fun onBackPressed() {
         val words = cameraView!!.savedWords
-        if(words != null) {
+        if (words != null) {
             cameraView!!.sendData(words)
-        }
-        else {
+        } else {
             finish()
         }
     }

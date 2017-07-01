@@ -17,9 +17,9 @@ class Bot(val board: Board) {
 
         var colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
         var wordsString = words.joinToString(separator = ",", transform = { w -> w.word.toLowerCase() })
-        if(clueList != null){
-            for(clue in clueList.list){
-                if(clue.team == team){
+        if (clueList != null) {
+            for (clue in clueList.list) {
+                if (clue.team == team) {
                     colorsString += "a"
                     wordsString += "," + clue.word.toLowerCase()
                 }

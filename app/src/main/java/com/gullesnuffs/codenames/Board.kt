@@ -98,10 +98,9 @@ class Board(var words: Array<Array<Word>>,
                 card.state = word.type
             }
 
-            if(word.isTarget){
+            if (word.isTarget) {
                 (card as TextView).setTextColor(context.resources.getColor(R.color.card_target_text_color))
-            }
-            else {
+            } else {
                 (card as TextView).setTextColor(context.resources.getColor(R.color.card_text_color))
             }
         }

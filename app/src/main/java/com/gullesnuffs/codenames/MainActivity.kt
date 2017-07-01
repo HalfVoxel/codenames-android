@@ -73,20 +73,18 @@ class MainActivity : AppCompatActivity() {
         clueList = ClueList(clueListView, this)
         val clueListAdapter = ClueListAdapter(clueList!!, { clue ->
             var targetWords = clue.getTargetWords()
-            if(clue == currentTargetClue){
+            if (clue == currentTargetClue) {
                 targetWords = mutableListOf<String>()
                 currentTargetClue = null
-            }
-            else{
+            } else {
                 currentTargetClue = clue
             }
-            for(i in 0 until board!!.height){
-                for(j in 0 until board!!.width){
+            for (i in 0 until board!!.height) {
+                for (j in 0 until board!!.width) {
                     val word = board!!.words[i][j]
-                    if(word.word.toLowerCase() in targetWords){
+                    if (word.word.toLowerCase() in targetWords) {
                         word.isTarget = true
-                    }
-                    else{
+                    } else {
                         word.isTarget = false
                     }
                 }
@@ -154,7 +152,7 @@ class MainActivity : AppCompatActivity() {
         updateLayout()
     }
 
-    fun addClue(clue: Clue){
+    fun addClue(clue: Clue) {
         val dialog = ClueDialog()
         clueList!!.addClue(clue)
         dialog.clue = clue
@@ -193,7 +191,7 @@ class MainActivity : AppCompatActivity() {
 
     @TargetApi(Build.VERSION_CODES.M)
     fun updateNavigationButtons() {
-        nextGameState.visibility = if(gameState == GameState.GetClues) INVISIBLE else VISIBLE
+        nextGameState.visibility = if (gameState == GameState.GetClues) INVISIBLE else VISIBLE
     }
 
     fun updateBoard() {

@@ -20,9 +20,9 @@ import java.io.ByteArrayOutputStream
 internal class CameraView(context: Context) : CameraViewBase(context) {
 
     var previousRequestDone = true
-    var lastUploadTime : DateTime = DateTime.now()
-    val requestQueue : RequestQueue = Volley.newRequestQueue(context)
-    var requestCode : RequestCode? = null
+    var lastUploadTime: DateTime = DateTime.now()
+    val requestQueue: RequestQueue = Volley.newRequestQueue(context)
+    var requestCode: RequestCode? = null
     var savedWords: ArrayList<ArrayList<String>>? = null
     var savedWordsCount: Int = 0
 
@@ -41,7 +41,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
         val imageData = jpeg.toByteArray()
 
         val url =
-                if(requestCode == RequestCode.WordRecognition)
+                if (requestCode == RequestCode.WordRecognition)
                     "https://judge.omogenheap.se/codenames/api/1/ocr-board"
                 else
                     "https://judge.omogenheap.se/codenames/api/1/ocr-grid"
@@ -60,15 +60,14 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                 val words = ArrayList<ArrayList<String>>()
                 for (r in 0 until grid.length()) {
                     val line = ArrayList<String>()
-                    if(requestCode == RequestCode.WordRecognition) {
+                    if (requestCode == RequestCode.WordRecognition) {
                         val jsonLine = grid.getJSONArray(r)
                         for (c in 0 until jsonLine.length()) {
                             line.add(jsonLine.getString(c))
                         }
-                    }
-                    else if(requestCode == RequestCode.GridRecognition){
+                    } else if (requestCode == RequestCode.GridRecognition) {
                         val jsonLine = grid.getString(r)
-                        for (c in 0 until jsonLine.length){
+                        for (c in 0 until jsonLine.length) {
                             line.add(jsonLine[c].toString())
                         }
                     }
@@ -84,11 +83,11 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                     var countB = 0
                     var countC = 0
                     var countR = 0
-                    for(row in words){
-                        for(word in row){
-                            if(word.length > 0)
+                    for (row in words) {
+                        for (word in row) {
+                            if (word.length > 0)
                                 wordCount += 1
-                            when(word){
+                            when (word) {
                                 "a" -> countA++
                                 "b" -> countB++
                                 "c" -> countC++
@@ -96,15 +95,15 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                             }
                         }
                     }
-                    if(wordCount > savedWordsCount) {
+                    if (wordCount > savedWordsCount) {
                         savedWords = words
                         savedWordsCount = wordCount
                     }
                     var failed = wordCount < 25
-                    if(requestCode == RequestCode.GridRecognition && (countA != 1 || countC != 7 || countR < 8 || countB < 8)){
+                    if (requestCode == RequestCode.GridRecognition && (countA != 1 || countC != 7 || countR < 8 || countB < 8)) {
                         failed = true
                     }
-                    if(!failed){
+                    if (!failed) {
                         sendData(words)
                     }
                 } else {
@@ -128,7 +127,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
             error.printStackTrace()
         }) {
             override fun getParams(): Map<String, String> {
-                val params = HashMap<String,String>()
+                val params = HashMap<String, String>()
                 params.put("size", "5x5")
                 return params
             }
@@ -141,10 +140,10 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
         requestQueue.add(multipartRequest)
     }
 
-    fun sendData(words: ArrayList<ArrayList<String>>){
+    fun sendData(words: ArrayList<ArrayList<String>>) {
         val data = Intent()
-        for(i in 0 until 5){
-            for(j in 0 until 5){
+        for (i in 0 until 5) {
+            for (j in 0 until 5) {
                 val key = "word" + i.toString() + "_" + j.toString()
                 data.putExtra(key, words[i][j])
             }

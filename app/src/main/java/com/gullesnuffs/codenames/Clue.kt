@@ -2,36 +2,36 @@ package com.gullesnuffs.codenames
 
 import android.os.Bundle
 
-class Clue (var word: String, var number: Int, var team: Team){
+class Clue(var word: String, var number: Int, var team: Team) {
 
-    var explanation : Explanation? = null
+    var explanation: Explanation? = null
 
-    override fun toString(): String{
+    override fun toString(): String {
         return word + "  " + number.toString()
     }
 
-    fun getColor(): Int{
+    fun getColor(): Int {
         return when (team) {
             Team.Red -> R.color.red_team_color
             Team.Blue -> R.color.blue_team_color
         }
     }
 
-    fun getColorCode(): String{
+    fun getColorCode(): String {
         return when (team) {
             Team.Red -> "r"
             Team.Blue -> "b"
         }
     }
 
-    fun onSaveInstanceState(outState: Bundle, prefix: String){
+    fun onSaveInstanceState(outState: Bundle, prefix: String) {
         outState.putString(prefix + "_word", word)
         outState.putInt(prefix + "_number", number)
         outState.putString(prefix + "_team", team.toString())
         explanation?.onSaveInstanceState(outState, prefix + "_explanation")
     }
 
-    fun onRestoreInstanceState(inState: Bundle, prefix: String){
+    fun onRestoreInstanceState(inState: Bundle, prefix: String) {
         word = inState.getString(prefix + "_word")
         number = inState.getInt(prefix + "_number")
         team = Team.valueOf(inState.getString(prefix + "_team"))
@@ -39,15 +39,15 @@ class Clue (var word: String, var number: Int, var team: Team){
         explanation!!.onRestoreInstanceState(inState, prefix + "_explanation")
     }
 
-    fun getTargetWords() : List<String> {
+    fun getTargetWords(): List<String> {
         val wordList = mutableListOf<String>()
-        if(explanation == null)
+        if (explanation == null)
             return wordList
-        val desiredType = if(team == Team.Red) WordType.Red else WordType.Blue
-        for(i in 0 until explanation!!.words.size){
-            if(explanation!!.types[i] == desiredType){
+        val desiredType = if (team == Team.Red) WordType.Red else WordType.Blue
+        for (i in 0 until explanation!!.words.size) {
+            if (explanation!!.types[i] == desiredType) {
                 wordList.add(explanation!!.words[i])
-                if(wordList.size == number){
+                if (wordList.size == number) {
                     break
                 }
             }
