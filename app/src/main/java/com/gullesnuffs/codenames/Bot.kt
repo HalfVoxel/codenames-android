@@ -47,15 +47,18 @@ class Bot(val board: Board) {
                             val jsonClue = bestClues.getJSONObject(i)
                             val word = jsonClue.getString("word")
                             val count = jsonClue.getInt("count")
-                            if (i == 0) {
-                                bestClue = Clue(word, count, team)
-                            }
+                            val clue = Clue(word, count, team)
+                            clue.explanation = Explanation()
                             val why = jsonClue.getJSONArray("why")
                             for (j in 0 until why.length()) {
                                 val jsonWhy = why.getJSONObject(j)
-                                val whyScore = jsonWhy.getDouble("score")
                                 val whyWord = jsonWhy.getString("word")
+                                val whyScore = jsonWhy.getDouble("score")
                                 val whyType = jsonWhy.getString("type")
+                                clue.explanation!!.add(whyWord, whyScore, whyType)
+                            }
+                            if (i == 0) {
+                                bestClue = clue
                             }
                         }
                         onFinish(bestClue!!)

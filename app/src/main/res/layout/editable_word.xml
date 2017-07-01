@@ -14,7 +14,7 @@
         android:text="WORD"
         android:fontFamily="sans-serif-condensed"
         android:textStyle="bold"
-        android:textColor="#CCC"
+        android:textColor="@color/card_text_color"
         android:maxLines="1"
         android:padding="2.5dp"
         android:inputType="text|textCapCharacters|textPhonetic"

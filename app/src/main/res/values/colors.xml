@@ -11,4 +11,6 @@
     <color name="assassin_color">#000000</color>
     <color name="not_contacted_color">#F0F0F0</color>
     <color name="main_background">#212121</color>
+    <color name="card_text_color">#CCC</color>
+    <color name="card_target_text_color">#4F2</color>
 </resources>

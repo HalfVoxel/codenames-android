@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     var autoCompleteAdapter: ArrayAdapter<String>? = null
     var boardLayout: TableLayout? = null
     var requestQueue: RequestQueue? = null
+    var currentTargetClue: Clue? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +71,28 @@ class MainActivity : AppCompatActivity() {
         val clueListView = findViewById(R.id.clue_list) as RecyclerView
         clueListView.layoutManager = LinearLayoutManager(this);
         clueList = ClueList(clueListView, this)
-        val clueListAdapter = ClueListAdapter(clueList!!, {})
+        val clueListAdapter = ClueListAdapter(clueList!!, { clue ->
+            var targetWords = clue.getTargetWords()
+            if(clue == currentTargetClue){
+                targetWords = mutableListOf<String>()
+                currentTargetClue = null
+            }
+            else{
+                currentTargetClue = clue
+            }
+            for(i in 0 until board!!.height){
+                for(j in 0 until board!!.width){
+                    val word = board!!.words[i][j]
+                    if(word.word.toLowerCase() in targetWords){
+                        word.isTarget = true
+                    }
+                    else{
+                        word.isTarget = false
+                    }
+                }
+            }
+            board!!.updateLayout()
+        })
         clueListView.adapter = clueListAdapter;
 
         requestQueue = Volley.newRequestQueue(this)
