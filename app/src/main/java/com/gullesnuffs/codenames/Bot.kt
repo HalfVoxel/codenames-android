@@ -12,11 +12,19 @@ import org.json.JSONObject
 
 class Bot(val board: Board) {
 
-    fun getClue(team: Team, requestQueue: RequestQueue, onFinish: (Clue) -> Any) {
+    fun getClue(team: Team, requestQueue: RequestQueue, clueList: ClueList?, onFinish: (Clue) -> Any) {
         val words = board.words.flatten().filter { !it.contacted }.toTypedArray()
 
-        val colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
-        val wordsString = words.joinToString(separator = ",", transform = { w -> w.word.toLowerCase() })
+        var colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
+        var wordsString = words.joinToString(separator = ",", transform = { w -> w.word.toLowerCase() })
+        if(clueList != null){
+            for(clue in clueList.list){
+                if(clue.team == team){
+                    colorsString += "a"
+                    wordsString += "," + clue.word.toLowerCase()
+                }
+            }
+        }
 
         var url = "https://judge.omogenheap.se/codenames/api/1/clue?"
         url += "engine=glove"

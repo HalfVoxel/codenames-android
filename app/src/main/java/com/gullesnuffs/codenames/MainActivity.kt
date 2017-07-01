@@ -102,21 +102,15 @@ class MainActivity : AppCompatActivity() {
 
         get_red_clue_button.setOnClickListener { _ ->
             val bot = Bot(board!!)
-            bot.getClue(Team.Red, requestQueue!!, { clue: Clue ->
-                val dialog = ClueDialog()
-                clueList!!.addClue(clue)
-                dialog.clue = clue
-                dialog.show(getFragmentManager(), "clue")
+            bot.getClue(Team.Red, requestQueue!!, clueList, { clue: Clue ->
+                addClue(clue)
             })
         }
 
         get_blue_clue_button.setOnClickListener { _ ->
             val bot = Bot(board!!)
-            bot.getClue(Team.Blue, requestQueue!!, { clue: Clue ->
-                val dialog = ClueDialog()
-                clueList!!.addClue(clue)
-                dialog.clue = clue
-                dialog.show(getFragmentManager(), "clue")
+            bot.getClue(Team.Blue, requestQueue!!, clueList, { clue: Clue ->
+                addClue(clue)
             })
         }
 
@@ -136,6 +130,13 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
         updateLayout()
+    }
+
+    fun addClue(clue: Clue){
+        val dialog = ClueDialog()
+        clueList!!.addClue(clue)
+        dialog.clue = clue
+        dialog.show(getFragmentManager(), "clue")
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,

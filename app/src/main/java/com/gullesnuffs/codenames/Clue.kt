@@ -14,6 +14,13 @@ class Clue (var word: String, var number: Int, var team: Team){
         }
     }
 
+    fun getColorCode(): String{
+        return when (team) {
+            Team.Red -> "r"
+            Team.Blue -> "b"
+        }
+    }
+
     fun onSaveInstanceState(outState: Bundle, prefix: String){
         outState.putString(prefix + "_word", word)
         outState.putInt(prefix + "_number", number)

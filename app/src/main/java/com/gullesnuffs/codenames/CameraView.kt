@@ -95,7 +95,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                         }
                     }
                     var failed = wordCount < 25
-                    if(requestCode == RequestCode.GridRecognition && (countA == 0 || countC != 7 || countR < 8 || countB < 8)){
+                    if(requestCode == RequestCode.GridRecognition && (countA != 1 || countC != 7 || countR < 8 || countB < 8)){
                         failed = true
                     }
                     if(!failed){
