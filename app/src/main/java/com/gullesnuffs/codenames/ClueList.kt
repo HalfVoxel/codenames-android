@@ -10,8 +10,7 @@ class ClueList(var listView: RecyclerView,
     val list = mutableListOf<Clue>()
 
     fun addClue(clue: Clue){
-        val newInd = list.size
-        list.add(clue)
+        list.add(0, clue)
 
         val inflater = LayoutInflater.from(context)
 
@@ -24,7 +23,8 @@ class ClueList(var listView: RecyclerView,
         clueNumberView.setText(clue.number.toString())
         clueNumberView.setTextColor(context.getResources().getColor(clue.getColor()))
 
-        listView.adapter.notifyItemInserted(newInd)
+        listView.adapter.notifyItemInserted(0)
+        listView.scrollToPosition(0);
     }
 
     fun clear(){
