@@ -26,6 +26,7 @@ import android.content.Intent
 import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
+import com.gullesnuffs.codenames.R.id.action_new_game
 
 
 enum class GameState {
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     var boardLayout: TableLayout? = null
     var requestQueue: RequestQueue? = null
     var currentTargetClue: Clue? = null
+    var optionsMenu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -216,6 +218,7 @@ class MainActivity : AppCompatActivity() {
                 clue_layout.visibility = INVISIBLE
                 remaining_layout.visibility = INVISIBLE
                 clue_list.visibility = INVISIBLE
+                optionsMenu?.findItem(R.id.action_new_game)?.setVisible(false)
             }
 
             GameState.EnterColors -> {
@@ -224,6 +227,7 @@ class MainActivity : AppCompatActivity() {
                 clue_layout.visibility = INVISIBLE
                 remaining_layout.visibility = INVISIBLE
                 clue_list.visibility = INVISIBLE
+                optionsMenu?.findItem(R.id.action_new_game)?.setVisible(false)
             }
 
             GameState.GetClues -> {
@@ -232,6 +236,7 @@ class MainActivity : AppCompatActivity() {
                 clue_layout.visibility = VISIBLE
                 remaining_layout.visibility = VISIBLE
                 clue_list.visibility = VISIBLE
+                optionsMenu?.findItem(R.id.action_new_game)?.setVisible(true)
             }
         }
     }
@@ -239,6 +244,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
+        optionsMenu = menu
         return true
     }
 

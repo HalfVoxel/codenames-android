@@ -11,5 +11,6 @@
         android:id="@+id/action_new_game"
         android:orderInCategory="10"
         android:title="New game"
+        android:visible="false"
         app:showAsAction="ifRoom"/>
 </menu>

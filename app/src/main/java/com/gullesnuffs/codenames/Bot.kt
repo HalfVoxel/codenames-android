@@ -17,11 +17,13 @@ class Bot(val board: Board) {
 
         var colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
         var wordsString = words.joinToString(separator = ",", transform = { w -> w.word.toLowerCase() })
+        var clueString = ""
         if (clueList != null) {
             for (clue in clueList.list) {
                 if (clue.team == team) {
-                    colorsString += "a"
-                    wordsString += "," + clue.word.toLowerCase()
+                    if(clueString.length > 0)
+                        clueString += ","
+                    clueString += clue.word + "," + clue.number
                 }
             }
         }
@@ -33,6 +35,9 @@ class Bot(val board: Board) {
         url += "&words=" + wordsString
         url += "&index=0"
         url += "&count=10"
+        if(clueString.length > 0){
+            url += "&earlierClues=" + clueString
+        }
 
         val stringRequest = StringRequest(Request.Method.GET, url,
                 {
