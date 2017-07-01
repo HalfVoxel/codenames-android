@@ -26,8 +26,48 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (requestCode != RequestCode.WordRecognition) return;
+        if (requestCode == RequestCode.WordRecognition) drawWordVisualization(canvas);
+        if (requestCode == RequestCode.GridRecognition) drawGridVisualization(canvas);
+    }
 
+    fun drawGridVisualization (canvas: Canvas) {
+        var clipRect = canvas.clipBounds
+        canvas.rotate(0f, clipRect.exactCenterY(), clipRect.exactCenterY())
+        clipRect = canvas.clipBounds
+        val paint = Paint()
+
+        val w = 5
+        val h = 5
+        var cellW = Math.min(clipRect.width() / h.toFloat(), clipRect.height() / w.toFloat())
+        var cellH = cellW
+        val scale = 0.7f
+        cellH *= scale
+        cellW *= scale
+        
+        for (r in 0 until w) {
+            for (c in 0 until h) {
+                val rf = RectF(0f, 0f, cellW, cellH)
+                rf.offsetTo(clipRect.exactCenterX() + (c - (w-1)/2f)*cellW, clipRect.exactCenterY()+ (r - (h-1)/2f)*cellH)
+                rf.offset(-cellW*0.5f, -cellH*0.5f)
+
+                rf.inset(cellW/20f, cellH/20f)
+
+                paint.style = Paint.Style.STROKE
+                paint.strokeWidth = 5f
+                paint.color = Color.argb(255, 221, 209, 168)
+                canvas.drawRoundRect(rf, 20f, 20f, paint)
+            }
+        }
+
+        paint.style = Paint.Style.STROKE
+        paint.color = Color.argb(255, 221, 209, 168)
+        paint.strokeWidth = 15f
+        val rf = RectF(0f, 0f, cellW, cellH)
+        rf.offsetTo(clipRect.exactCenterX(), clipRect.exactCenterY() + (h/2f)*cellH + 20f)
+        canvas.drawLine(rf.left - w*cellW/2f, rf.top, rf.left + w*cellW/2f, rf.top, paint)
+    }
+
+    fun drawWordVisualization (canvas: Canvas) {
         var clipRect = canvas.clipBounds
         canvas.rotate(90f, clipRect.exactCenterY(), clipRect.exactCenterY())
         clipRect = canvas.clipBounds
