@@ -1,7 +1,7 @@
 package com.gullesnuffs.codenames
 
 import android.content.Context
-import android.graphics.SurfaceTexture
+import android.graphics.*
 import android.hardware.Camera
 import android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
 import android.util.Log
@@ -57,9 +57,13 @@ abstract class CameraViewBase(context: Context) : SurfaceView(context), SurfaceH
 
             mCamera!!.startPreview()
         }
+
+        invalidate()
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
+        setWillNotDraw(false)
+
         Log.i(TAG, "surfaceCreated")
         mCamera = Camera.open()
         mCamera!!.setPreviewCallback { data, camera ->

@@ -4,9 +4,7 @@ import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.graphics.ImageFormat
-import android.graphics.Rect
-import android.graphics.YuvImage
+import android.graphics.*
 import android.net.Uri
 import android.util.Log
 import com.android.volley.*
@@ -24,12 +22,103 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
     val requestQueue: RequestQueue = Volley.newRequestQueue(context)
     var requestCode: RequestCode? = null
     var savedWords: ArrayList<ArrayList<String>>? = null
-    var savedWordsCount: Int = 0
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+
+        if (requestCode != RequestCode.WordRecognition) return;
+
+        var clipRect = canvas.clipBounds
+        canvas.rotate(90f, clipRect.exactCenterY(), clipRect.exactCenterY())
+        clipRect = canvas.clipBounds
+        val paint = Paint()
+
+        val w = 5
+        val h = 5
+        var cellW = clipRect.width() / h.toFloat()
+        var cellH = Math.max(cellW, clipRect.height() / w.toFloat()) * 0.65f
+        val scale = 0.7f
+        cellH *= scale
+        cellW *= scale
+
+        val words = savedWords
+        for (r in 0 until w) {
+            for (c in 0 until h) {
+                val rf = RectF(0f, 0f, cellW, cellH)
+                rf.offsetTo(clipRect.exactCenterX() + (c - (w-1)/2f)*cellW, clipRect.exactCenterY()+ (r - (h-1)/2f)*cellH)
+                rf.offset(-cellW*0.5f, -cellH*0.5f)
+
+                rf.inset(cellW/20f, cellH/20f)
+
+                if (words != null && words[r][c] != "") {
+                    paint.style = Paint.Style.FILL
+                    paint.color = Color.argb(180, 122, 216, 88)
+                    canvas.drawRoundRect(rf, 20f, 20f, paint)
+                    paint.strokeWidth = 10f
+                } else {
+                    paint.strokeWidth = 5f
+                }
+
+                paint.style = Paint.Style.STROKE
+                paint.color = Color.argb(255, 221, 209, 168)
+                canvas.drawRoundRect(rf, 20f, 20f, paint)
+
+                paint.style = Paint.Style.FILL
+                paint.color = Color.argb(50, 255, 255, 255)
+                rf.inset(cellH*0.10f, cellH*0.10f)
+                rf.top += rf.height() * 0.65f
+                canvas.drawRect(rf, paint)
+            }
+        }
+    }
+
+    fun saveWords(words : ArrayList<ArrayList<String>>) {
+        val wordCount = words.flatten().filter { it != "" }.size
+        if (wordCount <= 12) return
+
+        val saved = savedWords
+        if (saved == null) {
+            savedWords = words
+        } else {
+            for ((oldRow, newRow) in saved.zip(words)) {
+                for (i in 0 until newRow.size) {
+                    if (newRow[i] != "") oldRow[i] = newRow[i];
+                }
+            }
+        }
+
+        if (wordCount == 25) {
+            sendData(savedWords!!)
+        }
+    }
+
+    fun saveGrid(words : ArrayList<ArrayList<String>>) {
+        var countA = 0
+        var countB = 0
+        var countC = 0
+        var countR = 0
+        for (word in words.flatten()) {
+            when (word) {
+                "a" -> countA++
+                "b" -> countB++
+                "c" -> countC++
+                "r" -> countR++
+            }
+        }
+
+        if (countA == 1 && countC == 7 && countR >= 8 && countB >= 8) {
+            sendData(words)
+        }
+    }
 
     override fun processFrame(data: ByteArray) {
         if (lastUploadTime.plusMillis(1000).isBeforeNow() && previousRequestDone) {
             lastUploadTime = DateTime.now()
             uploadFrame(data)
+        }
+
+        handler.post {
+            invalidate()
         }
     }
 
@@ -75,37 +164,12 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                 }
 
                 if (status == "1") {
-                    // tell everybody you have succed upload image and post strings
-                    Log.i("Messsage", message)
+                    // tell everybody you have succeed upload image and post strings
+                    Log.i("Message", message)
                     Log.i("Grid: ", words.toString())
-                    var wordCount = 0
-                    var countA = 0
-                    var countB = 0
-                    var countC = 0
-                    var countR = 0
-                    for (row in words) {
-                        for (word in row) {
-                            if (word.length > 0)
-                                wordCount += 1
-                            when (word) {
-                                "a" -> countA++
-                                "b" -> countB++
-                                "c" -> countC++
-                                "r" -> countR++
-                            }
-                        }
-                    }
-                    if (wordCount > savedWordsCount) {
-                        savedWords = words
-                        savedWordsCount = wordCount
-                    }
-                    var failed = wordCount < 25
-                    if (requestCode == RequestCode.GridRecognition && (countA != 1 || countC != 7 || countR < 8 || countB < 8)) {
-                        failed = true
-                    }
-                    if (!failed) {
-                        sendData(words)
-                    }
+
+                    if (requestCode == RequestCode.GridRecognition) saveGrid(words)
+                    if (requestCode == RequestCode.WordRecognition) saveWords(words)
                 } else {
                     Log.i("Unexpected", message)
                 }
