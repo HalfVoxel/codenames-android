@@ -9,17 +9,6 @@
     android:background="@color/main_background"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:id="@+id/instructions"
-        android:layout_width="wrap_content"
-        android:layout_height="19dp"
-        android:text="@string/instructions_enter_words"
-        android:layout_marginTop="8dp"
-        android:textColor="#FFFFFF"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TableLayout
         android:id="@+id/board"
         android:layout_width="match_parent"
@@ -30,20 +19,33 @@
         tools:layout_editor_absoluteX="0dp"
         android:background="@android:color/transparent"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/instructions"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
     </TableLayout>
+
+    <TextView
+        android:id="@+id/instructions"
+        android:layout_width="wrap_content"
+        android:layout_height="19dp"
+        android:text="@string/instructions_enter_words"
+        android:layout_marginTop="8dp"
+        android:textColor="#FFFFFF"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/board" />
 
     <LinearLayout
         android:id="@+id/color_picker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:paddingTop="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/board">
+        app:layout_constraintTop_toBottomOf="@id/instructions">
         <Button
             android:id="@+id/place_red_spy_button"
             android:layout_width="0dp"
@@ -130,36 +132,33 @@
         app:layout_constraintTop_toBottomOf="@id/color_picker"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="18dp"
         android:orientation="vertical">
-        <TextView
-            android:id="@+id/or"
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="or"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"/>
+            android:orientation="horizontal"
+            >
 
-        <Button
-            android:id="@+id/take_a_photo"
-            android:layout_width="wrap_content"
-            android:layout_height="42dp"
-            android:layout_gravity="center_horizontal"
-            android:backgroundTint="#999"
-            android:text="Take a photo"
-            android:layout_marginTop="8dp" />
+            <Button
+                android:id="@+id/randomize"
+                android:background="@drawable/dice_6"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginRight="80dp"
+                android:backgroundTint="#EEE" />
 
+            <Button
+                android:id="@+id/take_a_photo"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:background="@drawable/ic_photo_camera_white_24dp"
+                android:backgroundTint="#EEE"
+                android:text=""
+                 />
 
-        <Button
-            android:id="@+id/randomize"
-            android:layout_width="wrap_content"
-            android:layout_height="42dp"
-            android:layout_gravity="center_horizontal"
-            android:backgroundTint="#999"
-            android:text="Randomize"
-            android:layout_marginTop="8dp" />
+        </LinearLayout>
     </LinearLayout>
 
 

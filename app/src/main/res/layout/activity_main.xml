@@ -22,17 +22,16 @@
 
     <include layout="@layout/content_main" />
 
-    <Button
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/nextGameState"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_gravity="center_horizontal|bottom"
-        android:text="Done"
-        android:drawableRight="@drawable/ic_check_white_24dp"
         android:layout_marginBottom="50dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        app:backgroundTint="@color/navigation_enabled"
+        android:src="@drawable/ic_check_black_36dp"
+        android:elevation="4dp"
+        app:fabSize="mini"
+        app:backgroundTint="#EEEEEE"
         />
 
 </android.support.design.widget.CoordinatorLayout>
