@@ -8,4 +8,16 @@
     <string name="new_game_message">Are you sure you want to start a new game?</string>
     <string name="new_game_yes">Yes</string>
     <string name="new_game_no">No</string>
+    <string name="pref_optimism_title">Clue difficulty</string>
+    <string-array name="pref_optimism_entries">
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+    </string-array>
+    <string-array name="pref_optimism_values">
+        <item>Easy</item>
+        <item>Medium</item>
+        <item>Hard</item>
+    </string-array>
+    <string name="pref_optimism_default">Medium</string>
 </resources>
