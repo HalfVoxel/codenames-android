@@ -8,6 +8,7 @@ import com.android.volley.toolbox.Volley
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import org.json.JSONObject
+import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 
 class Bot(val board: Board) {
@@ -17,14 +18,18 @@ class Bot(val board: Board) {
 
         var colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
         var wordsString = words.joinToString(separator = ",", transform = { w -> w.word.toLowerCase() })
-        var clueString = ""
+        var hintedString = ""
         if (clueList != null) {
+            val hintedWords = mutableSetOf<String>()
             for (clue in clueList.list) {
-                if (clue.team == team) {
-                    if(clueString.length > 0)
-                        clueString += ","
-                    clueString += clue.word + "," + clue.number
+                for (word in clue.getTargetWords()){
+                    hintedWords.add(word)
                 }
+            }
+            for (word in hintedWords){
+                if(hintedString.length > 0)
+                    hintedString += ","
+                hintedString += word
             }
         }
 
@@ -35,9 +40,9 @@ class Bot(val board: Board) {
         url += "&words=" + wordsString
         url += "&index=0"
         url += "&count=10"
-        if(clueString.length > 0){
-            url += "&earlierClues=" + clueString
-        }
+        if(hintedString.length == 0)
+            hintedString = "none"
+        url += "&hinted_words=" + hintedString
 
         val stringRequest = StringRequest(Request.Method.GET, url,
                 {
