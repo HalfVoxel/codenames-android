@@ -27,6 +27,7 @@ import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import com.gullesnuffs.codenames.R.id.action_new_game
+import java.util.*
 
 
 enum class GameState {
@@ -138,6 +139,46 @@ class MainActivity : AppCompatActivity() {
 
         take_a_photo.setOnClickListener { _ ->
             launchCamera()
+        }
+
+        randomize.setOnClickListener { _ ->
+            when(gameState){
+                GameState.EnterWords -> {
+                    val words = resources.getStringArray(R.array.wordlist)
+                    val usedWords = mutableListOf<String>()
+                    for(i in 0 until 5){
+                        for(j in 0 until 5){
+                            var word: String
+                            do {
+                                word = words[(Math.random() * words.size).toInt()]
+                            } while(word in usedWords)
+                            usedWords.add(word)
+                            board!!.words[i][j].word = word
+                        }
+                    }
+                }
+                GameState.EnterColors -> {
+                    val colors = mutableListOf<WordType>()
+                    colors.add(WordType.Assassin)
+                    for(i in 0 until 7)
+                        colors.add(WordType.Civilian)
+                    for(i in 0 until 8)
+                        colors.add(WordType.Red)
+                    for(i in 0 until 8)
+                        colors.add(WordType.Blue)
+                    if(Math.random() < 0.5)
+                        colors.add(WordType.Red)
+                    else
+                        colors.add(WordType.Blue)
+                    Collections.shuffle(colors)
+                    for(i in 0 until 5){
+                        for(j in 0 until 5){
+                            board!!.words[i][j].type = colors[5*i + j]
+                        }
+                    }
+                }
+            }
+            board!!.updateLayout()
         }
 
         updateLayout()

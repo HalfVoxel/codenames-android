@@ -5,7 +5,6 @@
     android:layout_margin="3dp"
     >
 
-
     <com.gullesnuffs.codenames.Card
         android:backgroundTint="@color/card"
         android:layout_width="match_parent"

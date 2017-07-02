@@ -150,6 +150,16 @@
             android:backgroundTint="#999"
             android:text="Take a photo"
             android:layout_marginTop="8dp" />
+
+
+        <Button
+            android:id="@+id/randomize"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="#999"
+            android:text="Randomize"
+            android:layout_marginTop="8dp" />
     </LinearLayout>
 
 
