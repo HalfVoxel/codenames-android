@@ -27,6 +27,8 @@ import android.support.constraint.ConstraintSet
 import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
 import android.util.Log
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import java.util.*
@@ -152,6 +154,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         randomize.setOnClickListener { _ ->
+            val anim = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+            anim.duration = 500
+            randomize.startAnimation(anim)
+
             when (gameState) {
                 GameState.EnterWords -> {
                     val words = resources.getStringArray(R.array.wordlist)
