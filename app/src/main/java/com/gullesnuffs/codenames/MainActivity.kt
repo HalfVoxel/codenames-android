@@ -23,10 +23,12 @@ import kotlinx.android.synthetic.main.content_main.*
 import android.content.DialogInterface
 import android.app.Activity
 import android.content.Intent
+import android.support.constraint.ConstraintSet
+import android.support.transition.AutoTransition
+import android.support.transition.TransitionManager
 import android.util.Log
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
-import com.gullesnuffs.codenames.R.id.action_new_game
 import java.util.*
 
 
@@ -52,10 +54,21 @@ class MainActivity : AppCompatActivity() {
     var currentTargetClue: Clue? = null
     var optionsMenu: Menu? = null
 
+    val constraintSet1 = ConstraintSet()
+    val constraintSetPlay = ConstraintSet()
+    val constraintSetWords = ConstraintSet()
+    val constraintSetColors = ConstraintSet()
+
+    var clueListView: RecyclerView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        constraintSet1.clone(constraintLayout)
+        constraintSetPlay.clone(this, R.layout.content_main_play)
+        constraintSetWords.clone(this, R.layout.content_main_words)
+        constraintSetColors.clone(this, R.layout.content_main_colors)
 
         boardLayout = findViewById(R.id.board) as TableLayout
         autoCompleteAdapter = ArrayAdapter<String>(this,
@@ -72,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         board = Board(defaultWords, WordType.Red, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
 
         val clueListView = findViewById(R.id.clue_list) as RecyclerView
+        this.clueListView = clueListView
         clueListView.layoutManager = LinearLayoutManager(this);
         clueList = ClueList(clueListView, this)
         val clueListAdapter = ClueListAdapter(clueList!!, { clue ->
@@ -85,11 +99,7 @@ class MainActivity : AppCompatActivity() {
             for (i in 0 until board!!.height) {
                 for (j in 0 until board!!.width) {
                     val word = board!!.words[i][j]
-                    if (word.word.toLowerCase() in targetWords) {
-                        word.isTarget = true
-                    } else {
-                        word.isTarget = false
-                    }
+                    word.isTarget = word.word.toLowerCase() in targetWords
                 }
             }
             board!!.updateLayout()
@@ -142,16 +152,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         randomize.setOnClickListener { _ ->
-            when(gameState){
+            when (gameState) {
                 GameState.EnterWords -> {
                     val words = resources.getStringArray(R.array.wordlist)
                     val usedWords = mutableListOf<String>()
-                    for(i in 0 until 5){
-                        for(j in 0 until 5){
+                    for (i in 0 until 5) {
+                        for (j in 0 until 5) {
                             var word: String
                             do {
                                 word = words[(Math.random() * words.size).toInt()]
-                            } while(word in usedWords)
+                            } while (word in usedWords)
                             usedWords.add(word)
                             board!!.words[i][j].word = word
                         }
@@ -160,20 +170,20 @@ class MainActivity : AppCompatActivity() {
                 GameState.EnterColors -> {
                     val colors = mutableListOf<WordType>()
                     colors.add(WordType.Assassin)
-                    for(i in 0 until 7)
+                    for (i in 0 until 7)
                         colors.add(WordType.Civilian)
-                    for(i in 0 until 8)
+                    for (i in 0 until 8)
                         colors.add(WordType.Red)
-                    for(i in 0 until 8)
+                    for (i in 0 until 8)
                         colors.add(WordType.Blue)
-                    if(Math.random() < 0.5)
+                    if (Math.random() < 0.5)
                         colors.add(WordType.Red)
                     else
                         colors.add(WordType.Blue)
                     Collections.shuffle(colors)
-                    for(i in 0 until 5){
-                        for(j in 0 until 5){
-                            board!!.words[i][j].type = colors[5*i + j]
+                    for (i in 0 until 5) {
+                        for (j in 0 until 5) {
+                            board!!.words[i][j].type = colors[5 * i + j]
                         }
                     }
                 }
@@ -192,6 +202,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+
         updateLayout()
     }
 
@@ -229,12 +240,7 @@ class MainActivity : AppCompatActivity() {
     fun launchCamera() {
         ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.CAMERA),
-                1);
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    fun updateNavigationButtons() {
-        nextGameState.visibility = if (gameState == GameState.GetClues) INVISIBLE else VISIBLE
+                1)
     }
 
     fun updateBoard() {
@@ -243,40 +249,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateLayout() {
-        updateNavigationButtons()
         updateBoard()
 
-        val colorPickerVisibility = if (gameState == GameState.EnterColors) VISIBLE else INVISIBLE
-        place_red_spy_button.visibility = colorPickerVisibility
-        place_blue_spy_button.visibility = colorPickerVisibility
-        place_civilian_button.visibility = colorPickerVisibility
-        place_assassin_button.visibility = colorPickerVisibility
+        val transition = AutoTransition()
+        transition.duration = 150
+        TransitionManager.beginDelayedTransition(constraintLayout, transition)
+        val constraint = when (gameState) {
+            GameState.EnterWords -> constraintSetWords
+            GameState.EnterColors -> constraintSetColors
+            GameState.GetClues -> constraintSetPlay
+        }
+        constraint.applyTo(constraintLayout)
 
         when (gameState) {
             GameState.EnterWords -> {
                 instructions.setText(R.string.instructions_enter_words)
-                take_a_photo_layout.visibility = VISIBLE
-                clue_layout.visibility = INVISIBLE
-                remaining_layout.visibility = INVISIBLE
-                clue_list.visibility = INVISIBLE
                 optionsMenu?.findItem(R.id.action_new_game)?.setVisible(false)
             }
 
             GameState.EnterColors -> {
                 instructions.setText(R.string.instructions_enter_colors)
-                take_a_photo_layout.visibility = VISIBLE
-                clue_layout.visibility = INVISIBLE
-                remaining_layout.visibility = INVISIBLE
-                clue_list.visibility = INVISIBLE
                 optionsMenu?.findItem(R.id.action_new_game)?.setVisible(false)
             }
 
             GameState.GetClues -> {
                 instructions.setText(R.string.instructions_get_clues)
-                take_a_photo_layout.visibility = INVISIBLE
-                clue_layout.visibility = VISIBLE
-                remaining_layout.visibility = VISIBLE
-                clue_list.visibility = VISIBLE
                 optionsMenu?.findItem(R.id.action_new_game)?.setVisible(true)
             }
         }
@@ -304,10 +301,10 @@ class MainActivity : AppCompatActivity() {
 
                 builder.setMessage(R.string.new_game_message)
                         .setTitle(R.string.new_game_title)
-                builder.setPositiveButton(R.string.new_game_yes, DialogInterface.OnClickListener { dialog, id ->
+                builder.setPositiveButton(R.string.new_game_yes, { dialog, id ->
                     val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
-                    val defaultWords = Array<Array<Word>>(5) {
-                        Array<Word>(5) {
+                    val defaultWords = Array(5) {
+                        Array(5) {
                             Word("", WordType.Civilian, false)
                         }
                     }
