@@ -151,54 +151,66 @@ class MainActivity : AppCompatActivity() {
             launchCamera()
         }
 
-        randomize.setOnClickListener { _ ->
-            val anim = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
-            anim.duration = 500
-            randomize.startAnimation(anim)
+        randomize.setOnClickListener { _ -> randomize() }
 
-            when (gameState.value) {
-                GameState.EnterWords -> {
-                    val words = resources.getStringArray(R.array.wordlist)
-                    val usedWords = mutableListOf<String>()
+        react({ onGameStateChanged() }, gameState)
 
-                    board!!.flashCards({ _, word ->
-                        var w: String
-                        do {
-                            w = words[(Math.random() * words.size).toInt()]
-                        } while (w in usedWords)
-                        usedWords.add(w)
-                        word.word.value = w
-                    })
-                }
-
-                GameState.EnterColors -> {
-                    val colors = mutableListOf<WordType>()
-                    colors.add(WordType.Assassin)
-                    for (i in 0 until 7)
-                        colors.add(WordType.Civilian)
-                    for (i in 0 until 8)
-                        colors.add(WordType.Red)
-                    for (i in 0 until 8)
-                        colors.add(WordType.Blue)
-                    if (Math.random() < 0.5)
-                        colors.add(WordType.Red)
-                    else
-                        colors.add(WordType.Blue)
-                    Collections.shuffle(colors)
-
-                    val flattened = board!!.words.flatten()
-                    board!!.flashCards({ _, word ->
-                        word.type.value = colors[flattened.indexOf(word)]
-                    })
-                }
-                GameState.GetClues -> {}
-            }
-            // board!!.updateLayout()
-        }
-
-        react({ updateLayout() }, gameState)
         init(gameState)
-        updateLayout()
+    }
+
+    fun randomize() {
+        val anim = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        anim.duration = 500
+        randomize.startAnimation(anim)
+
+        when (gameState.value) {
+            GameState.EnterWords -> {
+                val words = resources.getStringArray(R.array.wordlist)
+                val usedWords = mutableListOf<String>()
+
+                board!!.flashCards({ _, word ->
+                    var w: String
+                    do {
+                        w = words[(Math.random() * words.size).toInt()]
+                    } while (w in usedWords)
+                    usedWords.add(w)
+                    word.word.value = w
+                })
+            }
+
+            GameState.EnterColors -> {
+                val colors = mutableListOf<WordType>()
+                colors.add(WordType.Assassin)
+                for (i in 0 until 7)
+                    colors.add(WordType.Civilian)
+                for (i in 0 until 8)
+                    colors.add(WordType.Red)
+                for (i in 0 until 8)
+                    colors.add(WordType.Blue)
+                if (Math.random() < 0.5)
+                    colors.add(WordType.Red)
+                else
+                    colors.add(WordType.Blue)
+                Collections.shuffle(colors)
+
+                val flattened = board!!.words.flatten()
+                board!!.flashCards({ _, word ->
+                    word.type.value = colors[flattened.indexOf(word)]
+                })
+            }
+            GameState.GetClues -> {
+            }
+        }
+    }
+
+    fun clearBoard() {
+        board!!.words.flatten().forEach {
+            it.word.value = ""
+            it.type.value = WordType.Civilian
+            it.contacted.value = false
+            it.score = 0f
+            it.isTarget = false
+        }
     }
 
     override fun onBackPressed() {
@@ -210,7 +222,6 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
 
-        updateLayout()
         board!!.displayScores = false
         board!!.resetCardOverrideColors()
     }
@@ -252,14 +263,7 @@ class MainActivity : AppCompatActivity() {
                 1)
     }
 
-    fun updateBoard() {
-        // val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
-        // board = Board(board!!.words, board!!.paintType, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState.value, this)
-    }
-
-    fun updateLayout() {
-        updateBoard()
-
+    fun onGameStateChanged() {
         val transition = AutoTransition()
         transition.duration = 150
         TransitionManager.beginDelayedTransition(constraintLayout, transition)
@@ -311,14 +315,7 @@ class MainActivity : AppCompatActivity() {
                 builder.setMessage(R.string.new_game_message)
                         .setTitle(R.string.new_game_title)
                 builder.setPositiveButton(R.string.new_game_yes, { _, _ ->
-                    board!!.words.flatten().forEach {
-                        it.word.value = ""
-                        it.type.value = WordType.Civilian
-                        it.contacted.value = false
-                        it.score = 0f
-                        it.isTarget = false
-                    }
-
+                    clearBoard()
                     gameState.value = GameState.EnterWords
                     clueList!!.clear()
                 })
