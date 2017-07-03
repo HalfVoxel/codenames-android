@@ -21,7 +21,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
     var lastUploadTime: DateTime = DateTime.now()
     val requestQueue: RequestQueue = Volley.newRequestQueue(context)
     var requestCode: RequestCode? = null
-    var savedWords: ArrayList<ArrayList<String>>? = null
+    var savedWords: Array<Array<String>>? = null
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -112,7 +112,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
         }
     }
 
-    fun saveWords(words : ArrayList<ArrayList<String>>) {
+    fun saveWords(words : Array<Array<String>>) {
         val wordCount = words.flatten().filter { it != "" }.size
         if (wordCount <= 12) return
 
@@ -134,7 +134,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
         }
     }
 
-    fun saveGrid(words : ArrayList<ArrayList<String>>) {
+    fun saveGrid(words : Array<Array<String>>) {
         var countA = 0
         var countB = 0
         var countC = 0
@@ -149,8 +149,20 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
         }
 
         if (countA == 1 && countC == 7 && countR >= 8 && countB >= 8) {
-            sendData(words)
+            sendData(rotateCCW(words))
         }
+    }
+
+    fun rotateCCW(words : Array<Array<String>>): Array<Array<String>> {
+        val result = Array(words.size, { Array(words.size, { "" }) })
+        for (r in 0 until words.size) {
+            for (c in 0 until words.size) {
+                val nr = c
+                val nc = words.size - r - 1
+                result[nr][nc] = words[r][c]
+            }
+        }
+        return result
     }
 
     override fun processFrame(data: ByteArray) {
@@ -188,21 +200,22 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                 val status = result.getString("status")
                 val message = result.getString("message")
                 val grid = result.getJSONArray("grid")
-                val words = ArrayList<ArrayList<String>>()
+                val words = Array(grid.length(), { Array(grid.length(), { "" }) })
                 for (r in 0 until grid.length()) {
                     val line = ArrayList<String>()
                     if (requestCode == RequestCode.WordRecognition) {
                         val jsonLine = grid.getJSONArray(r)
+                        if (jsonLine.length() != grid.length()) throw Exception("Non-square matrix received from server")
                         for (c in 0 until jsonLine.length()) {
-                            line.add(jsonLine.getString(c))
+                            words[r][c] = jsonLine.getString(c)
                         }
                     } else if (requestCode == RequestCode.GridRecognition) {
                         val jsonLine = grid.getString(r)
+                        if (jsonLine.length != grid.length()) throw Exception("Non-square matrix received from server")
                         for (c in 0 until jsonLine.length) {
-                            line.add(jsonLine[c].toString())
+                            words[r][c] = jsonLine[c].toString()
                         }
                     }
-                    words.add(line)
                 }
 
                 if (status == "1") {
@@ -246,7 +259,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
         requestQueue.add(multipartRequest)
     }
 
-    fun sendData(words: ArrayList<ArrayList<String>>) {
+    fun sendData(words: Array<Array<String>>) {
         val data = Intent()
         for (i in 0 until 5) {
             for (j in 0 until 5) {
