@@ -15,24 +15,20 @@ enum class WordType {
     Assassin
 }
 
-class Word(var word: String, var type: WordType, var contacted: Boolean) {
-
+class Word(val row : Int, val column : Int) {
+    var word = Observable("")
+    var type = Observable(WordType.Civilian)
+    var contacted = Observable(false)
     var isTarget = false
     var score = 0f
 
-    constructor(inState: Bundle, prefix: String) : this(
-            inState.getString(prefix + "_word"),
-            WordType.valueOf(inState.getString(prefix + "_type")),
-            inState.getBoolean(prefix + "_contacted")) {
-    }
-
     override fun toString(): String {
-        return word
+        return word.value
     }
 
     fun getColor(gameState: GameState): Int {
-        if (contacted || gameState == GameState.EnterColors) {
-            return when (type) {
+        if (contacted.value || gameState == GameState.EnterColors) {
+            return when (type.value) {
                 WordType.Red -> R.color.red_team_color
                 WordType.Blue -> R.color.blue_team_color
                 WordType.Civilian -> R.color.civilian_color
@@ -44,7 +40,7 @@ class Word(var word: String, var type: WordType, var contacted: Boolean) {
     }
 
     fun getColorCode(): String {
-        return when (type) {
+        return when (type.value) {
             WordType.Red -> "r"
             WordType.Blue -> "b"
             WordType.Civilian -> "c"
@@ -53,8 +49,14 @@ class Word(var word: String, var type: WordType, var contacted: Boolean) {
     }
 
     fun onSaveInstanceState(outState: Bundle, prefix: String) {
-        outState.putString(prefix + "_word", word)
-        outState.putString(prefix + "_type", type.toString())
-        outState.putBoolean(prefix + "_contacted", contacted)
+        outState.putString(prefix + "_word", word.value)
+        outState.putString(prefix + "_type", type.value.toString())
+        outState.putBoolean(prefix + "_contacted", contacted.value)
+    }
+
+    fun onRestoreInstanceState(inState: Bundle, prefix: String) {
+        word.value = inState.getString(prefix + "_word")
+        type.value = WordType.valueOf(inState.getString(prefix + "_type"))
+        contacted.value = inState.getBoolean(prefix + "_contacted")
     }
 }

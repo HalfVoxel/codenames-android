@@ -31,6 +31,7 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
+import kotlinx.android.synthetic.main.clue_dialog.view.*
 import java.util.*
 
 
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     var board: Board? = null
     var clueList: ClueList? = null
-    var gameState = GameState.EnterWords
+    val gameState = Observable(GameState.EnterWords)
     var autoCompleteAdapter: ArrayAdapter<String>? = null
     var boardLayout: TableLayout? = null
     var requestQueue: RequestQueue? = null
@@ -79,19 +80,14 @@ class MainActivity : AppCompatActivity() {
 
         val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
 
-        val defaultWords = Array(5) {
-            Array(5) {
-                Word("", WordType.Civilian, false)
-            }
-        }
-        board = Board(defaultWords, WordType.Red, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
+        board = Board(boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
 
         val clueListView = findViewById(R.id.clue_list) as RecyclerView
         this.clueListView = clueListView
         clueListView.layoutManager = LinearLayoutManager(this);
         clueList = ClueList(clueListView, this)
         val clueListAdapter = ClueListAdapter(clueList!!, { clue ->
-            var targetWords = clue.getTargetWords()
+            val targetWords = clue.getTargetWords()
             if (clue == currentTargetClue) {
                 currentTargetClue = null
                 board!!.displayScores = false
@@ -102,25 +98,23 @@ class MainActivity : AppCompatActivity() {
                 for (i in 0 until board!!.height) {
                     for (j in 0 until board!!.width) {
                         val word = board!!.words[i][j]
-                        word.isTarget = word.word.toLowerCase() in targetWords
-                        word.score = clue.getWordScore(word.word.toLowerCase())
+                        word.isTarget = word.word.value.toLowerCase() in targetWords
+                        word.score = clue.getWordScore(word.word.value.toLowerCase())
                     }
                 }
             }
-
-            board!!.updateLayout()
+            board!!.animateCardScores()
         })
         clueListView.adapter = clueListAdapter;
 
         requestQueue = Volley.newRequestQueue(this)
 
         nextGameState.setOnClickListener { _ ->
-            if (gameState == GameState.EnterWords) {
-                gameState = GameState.EnterColors
-            } else if (gameState == GameState.EnterColors) {
-                gameState = GameState.GetClues
+            if (gameState.value == GameState.EnterWords) {
+                gameState.value = GameState.EnterColors
+            } else if (gameState.value == GameState.EnterColors) {
+                gameState.value = GameState.GetClues
             }
-            updateLayout()
         }
 
         place_red_spy_button.setOnClickListener { _ ->
@@ -162,21 +156,21 @@ class MainActivity : AppCompatActivity() {
             anim.duration = 500
             randomize.startAnimation(anim)
 
-            when (gameState) {
+            when (gameState.value) {
                 GameState.EnterWords -> {
                     val words = resources.getStringArray(R.array.wordlist)
                     val usedWords = mutableListOf<String>()
-                    for (i in 0 until 5) {
-                        for (j in 0 until 5) {
-                            var word: String
-                            do {
-                                word = words[(Math.random() * words.size).toInt()]
-                            } while (word in usedWords)
-                            usedWords.add(word)
-                            board!!.words[i][j].word = word
-                        }
-                    }
+
+                    board!!.flashCards({ _, word ->
+                        var w: String
+                        do {
+                            w = words[(Math.random() * words.size).toInt()]
+                        } while (w in usedWords)
+                        usedWords.add(w)
+                        word.word.value = w
+                    })
                 }
+
                 GameState.EnterColors -> {
                     val colors = mutableListOf<WordType>()
                     colors.add(WordType.Assassin)
@@ -191,30 +185,33 @@ class MainActivity : AppCompatActivity() {
                     else
                         colors.add(WordType.Blue)
                     Collections.shuffle(colors)
-                    for (i in 0 until 5) {
-                        for (j in 0 until 5) {
-                            board!!.words[i][j].type = colors[5 * i + j]
-                        }
-                    }
+
+                    val flattened = board!!.words.flatten()
+                    board!!.flashCards({ _, word ->
+                        word.type.value = colors[flattened.indexOf(word)]
+                    })
                 }
+                GameState.GetClues -> {}
             }
-            board!!.updateLayout()
-            board!!.flashCards()
+            // board!!.updateLayout()
         }
 
+        react({ updateLayout() }, gameState)
+        init(gameState)
         updateLayout()
     }
 
     override fun onBackPressed() {
-        if (gameState == GameState.EnterColors) {
-            gameState = GameState.EnterWords
-        } else if (gameState == GameState.GetClues) {
-            gameState = GameState.EnterColors
+        if (gameState.value == GameState.EnterColors) {
+            gameState.value = GameState.EnterWords
+        } else if (gameState.value == GameState.GetClues) {
+            gameState.value = GameState.EnterColors
         } else {
             super.onBackPressed()
         }
 
         updateLayout()
+        board!!.displayScores = false
         board!!.resetCardOverrideColors()
     }
 
@@ -234,7 +231,7 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay!
                     val i = Intent(this, CameraActivity::class.java)
-                    val requestCode = if (gameState == GameState.EnterWords) RequestCode.WordRecognition else RequestCode.GridRecognition
+                    val requestCode = if (gameState.value == GameState.EnterWords) RequestCode.WordRecognition else RequestCode.GridRecognition
                     i.putExtra("RequestCode", requestCode)
                     startActivityForResult(i, requestCode.ordinal)
                 } else {
@@ -256,8 +253,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun updateBoard() {
-        val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
-        board = Board(board!!.words, board!!.paintType, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
+        // val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
+        // board = Board(board!!.words, board!!.paintType, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState.value, this)
     }
 
     fun updateLayout() {
@@ -266,14 +263,14 @@ class MainActivity : AppCompatActivity() {
         val transition = AutoTransition()
         transition.duration = 150
         TransitionManager.beginDelayedTransition(constraintLayout, transition)
-        val constraint = when (gameState) {
+        val constraint = when (gameState.value) {
             GameState.EnterWords -> constraintSetWords
             GameState.EnterColors -> constraintSetColors
             GameState.GetClues -> constraintSetPlay
         }
         constraint.applyTo(constraintLayout)
 
-        when (gameState) {
+        when (gameState.value) {
             GameState.EnterWords -> {
                 instructions.setText(R.string.instructions_enter_words)
                 optionsMenu?.findItem(R.id.action_new_game)?.setVisible(false)
@@ -313,20 +310,19 @@ class MainActivity : AppCompatActivity() {
 
                 builder.setMessage(R.string.new_game_message)
                         .setTitle(R.string.new_game_title)
-                builder.setPositiveButton(R.string.new_game_yes, { dialog, id ->
-                    val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
-                    val defaultWords = Array(5) {
-                        Array(5) {
-                            Word("", WordType.Civilian, false)
-                        }
+                builder.setPositiveButton(R.string.new_game_yes, { _, _ ->
+                    board!!.words.flatten().forEach {
+                        it.word.value = ""
+                        it.type.value = WordType.Civilian
+                        it.contacted.value = false
+                        it.score = 0f
+                        it.isTarget = false
                     }
 
-                    board = Board(defaultWords, WordType.Red, boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
-                    gameState = GameState.EnterWords
-                    updateLayout()
+                    gameState.value = GameState.EnterWords
                     clueList!!.clear()
                 })
-                builder.setNegativeButton(R.string.new_game_no, DialogInterface.OnClickListener { dialog, id ->
+                builder.setNegativeButton(R.string.new_game_no, { dialog, id ->
                     // User cancelled the dialog
                 })
 
@@ -346,13 +342,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRestoreInstanceState(inState: Bundle) {
-        val newGameState = GameState.valueOf(inState.getString("game_state"))
+        gameState.value = GameState.valueOf(inState.getString("game_state"))
         board!!.onRestoreInstanceState(inState, "board")
-        if (newGameState != gameState) {
-            gameState = GameState.valueOf(inState.getString("game_state"))
-            updateLayout()
-        }
-        board!!.updateLayout()
         super.onRestoreInstanceState(inState)
     }
 
@@ -364,10 +355,9 @@ class MainActivity : AppCompatActivity() {
                         for (j in 0 until 5) {
                             val key = "word" + i.toString() + "_" + j.toString()
                             val word = data.extras[key] as String
-                            board!!.words[i][j].word = word
+                            board!!.words[i][j].word.value = word
                         }
                     }
-                    board!!.updateLayout()
                     nextGameState.requestFocus()
                 }
             }
@@ -388,11 +378,10 @@ class MainActivity : AppCompatActivity() {
                                         }
                                     }
                             if (wordType != null) {
-                                board!!.words[i][j].type = wordType
+                                board!!.words[i][j].type.value = wordType
                             }
                         }
                     }
-                    board!!.updateLayout()
                 }
             }
         }

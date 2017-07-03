@@ -1,5 +1,6 @@
 package com.gullesnuffs.codenames
 
+import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
@@ -9,15 +10,16 @@ import android.widget.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 
 
-class Board(var words: Array<Array<Word>>,
-            var paintType: WordType,
-            var layout: TableLayout,
+class Board(var layout: TableLayout,
             val remainingLayout: ViewGroup,
             val autoCompleteAdapter: ArrayAdapter<String>,
-            val gameState: GameState,
+            val gameState: Observable<GameState>,
             val context: Context) {
+    var words = Array(5, { r -> Array(5, { c -> Word(r, c) })})
+    var paintType = WordType.Red
     var width: Int = words[0].size
     var height: Int = words.size
     val cards = ArrayList<Card>()
@@ -45,31 +47,51 @@ class Board(var words: Array<Array<Word>>,
 
         cards.zip(words.flatten()).forEach { (card, word) ->
             val parent = card.parent as ViewGroup
-            when (gameState) {
-                GameState.EnterWords -> {
-                    card.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
-                    card.onChanged = { s -> word.word = s }
-                    card.editable = true
-                }
-                GameState.EnterColors -> {
-                    parent.setOnClickListener { _ ->
-                        word.type = paintType
-                        updateLayout()
-                    }
-                    card.editable = false
-                }
-                GameState.GetClues -> {
-                    parent.setOnClickListener { _ ->
-                        word.contacted = !word.contacted
-                        updateLayout()
-                    }
-                    card.editable = false
+            react({ _, new -> (card as TextView).text = new }, word.word)
+            // Note that setSilently must be used because otherwise setting the word will
+            // in turn trigger an update of the text field, which will trigger the word to be set again etc.
+            card.onChanged = { s -> word.word.setSilently(s) }
+            react({ _, new -> card.editable = new == GameState.EnterWords }, gameState)
+
+            card.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
+            parent.setOnClickListener { _ ->
+                if (gameState.value == GameState.EnterColors) {
+                    word.type.value = paintType
+                    //updateLayout()
+                } else if (gameState.value == GameState.GetClues) {
+                    word.contacted.value = !word.contacted.value
+                    //updateLayout()
                 }
             }
+
+            react({
+                if (gameState.value == GameState.GetClues) {
+                    card.state = if (word.contacted.value) word.type.value else null
+                } else {
+                    card.state = word.type.value
+                }
+            }, word.type, word.contacted, gameState)
+
+            // Make sure the card is up to date
+            word.word.init()
+            word.type.init()
         }
 
+        react({
+            val remainingCount = intArrayOf(0, 0, 0, 0)
+            cards.zip(words.flatten()).forEach { (card, word) ->
+                if (!word.contacted.value) {
+                    remainingCount[word.type.value.ordinal]++
+                }
+            }
+            layout.invalidate()
+            redSpiesRemainingView.text = remainingCount[WordType.Red.ordinal].toString()
+            blueSpiesRemainingView.text = remainingCount[WordType.Blue.ordinal].toString()
+            civiliansRemainingView.text = remainingCount[WordType.Civilian.ordinal].toString()
+            remainingLayout.invalidate()
+        }, *words.flatten().map { it.contacted }.toTypedArray())
+
         initializeFocus(cards)
-        updateLayout()
     }
 
     fun initializeFocus(textViews: ArrayList<Card>) {
@@ -84,14 +106,33 @@ class Board(var words: Array<Array<Word>>,
         }
     }
 
-    fun flashCards() {
+    fun flashCards(flash : ((Card,Word) -> Unit)?) {
         currentAnimationSet.cancel()
         currentAnimationSet = AnimatorSet()
         cards.zip(words.flatten()).forEach { (card, word) ->
             val anim = ObjectAnimator.ofArgb(card, "borderOverrideColor", Color.argb(180, 255, 255, 255), Color.argb(0, 255, 255, 255))
-            anim.duration = 400
-            anim.startDelay = (Math.random() * 200).toLong()
+            anim.duration = 600
+            //anim.startDelay = (Math.random() * 300).toLong()
+            val dr = word.row - (height-1)/2.0
+            val dc = word.column - (width-1)/2.0
+            //anim.startDelay = ((dr*dr + dc*dc) * 30).toLong()
+            anim.startDelay = (word.column * 50 + Math.random()*50).toLong()
             anim.addUpdateListener { card.invalidate() }
+            anim.addListener(object: Animator.AnimatorListener {
+                override fun onAnimationEnd(p0: Animator?) {
+                }
+
+                override fun onAnimationCancel(p0: Animator?) {
+                }
+
+                override fun onAnimationStart(p0: Animator?) {
+                    flash?.invoke(card, word)
+                }
+
+                override fun onAnimationRepeat(p0: Animator?) {
+                }
+
+            })
             currentAnimationSet.play(anim)
         }
         currentAnimationSet.start()
@@ -101,32 +142,25 @@ class Board(var words: Array<Array<Word>>,
         currentAnimationSet.cancel()
         currentAnimationSet = AnimatorSet()
         cards.zip(words.flatten()).forEach { (card, word) ->
-            val anim = ObjectAnimator.ofArgb(card, "borderOverrideColor", card.borderOverrideColor, Color.argb(0, 255, 255, 255))
+            var anim = ObjectAnimator.ofArgb(card, "borderOverrideColor", card.borderOverrideColor, Color.argb(0, 255, 255, 255))
             anim.duration = 400
             anim.startDelay = (Math.random() * 200).toLong()
             anim.addUpdateListener { card.invalidate() }
+            currentAnimationSet.play(anim)
+
+            anim = ObjectAnimator.ofArgb(card, "surfaceOverrideColor", card.surfaceOverrideColor, Color.argb(0, 255, 255, 255))
+            anim.duration = anim.duration
+            anim.startDelay = anim.startDelay
             currentAnimationSet.play(anim)
         }
         currentAnimationSet.start()
     }
 
-    fun updateLayout() {
+    fun animateCardScores() {
         val maxScore = words.flatten().maxBy { it.score }!!.score
         currentAnimationSet.cancel()
         currentAnimationSet = AnimatorSet()
-        val remainingCount = intArrayOf(0, 0, 0, 0)
         cards.zip(words.flatten()).forEach { (card, word) ->
-            if (!word.contacted) {
-                remainingCount[word.type.ordinal]++
-            }
-
-            (card as TextView).text = word.word
-            if (gameState == GameState.GetClues) {
-                card.state = if (word.contacted) word.type else null
-            } else {
-                card.state = word.type
-            }
-
             var targetColor1 = if(word.isTarget) Color.WHITE else Color.argb(255, 0, 0, 0)
             var alpha = Math.max(0f, word.score / maxScore)
             // Make things more distinct in the UI
@@ -141,48 +175,35 @@ class Board(var words: Array<Array<Word>>,
                 targetColor2 = Color.argb(0, 0, 0, 0)
             }
 
+            // Get a nicer transition if we start with the correct color values and just animate the alpha
+            if (Color.alpha(card.borderOverrideColor) == 0) card.borderOverrideColor = Color.argb(0, Color.red(targetColor1), Color.green(targetColor1), Color.blue(targetColor1))
             val anim = ObjectAnimator.ofArgb(card, "borderOverrideColor", card.borderOverrideColor, targetColor1)
             anim.duration = 400
             anim.startDelay = ((1 - alpha) * 100).toLong()
             anim.addUpdateListener { card.invalidate() }
             currentAnimationSet.play(anim)
 
+            if (Color.alpha(card.surfaceOverrideColor) == 0) card.surfaceOverrideColor = Color.argb(0, Color.red(targetColor2), Color.green(targetColor2), Color.blue(targetColor2))
             val anim2 = ObjectAnimator.ofArgb(card, "surfaceOverrideColor", card.surfaceOverrideColor, targetColor2)
             anim2.duration = anim.duration
             anim2.startDelay = anim.startDelay
             currentAnimationSet.play(anim2)
         }
         currentAnimationSet.start()
-
-        layout.invalidate()
-
-        redSpiesRemainingView.text = remainingCount[WordType.Red.ordinal].toString()
-        blueSpiesRemainingView.text = remainingCount[WordType.Blue.ordinal].toString()
-        civiliansRemainingView.text = remainingCount[WordType.Civilian.ordinal].toString()
-        remainingLayout.invalidate()
     }
 
     fun onSaveInstanceState(outState: Bundle, prefix: String) {
         outState.putInt(prefix + "_width", width)
         outState.putInt(prefix + "_height", height)
         outState.putString(prefix + "_paint_type", paintType.toString())
-        for (i in 0 until width) {
-            for (j in 0 until height) {
-                words[i][j].onSaveInstanceState(outState, prefix + "_word_" + i + "_" + j);
-            }
-        }
+        words.flatten().forEachIndexed { index, word ->  word.onSaveInstanceState(outState, prefix + "_word_" + index) }
     }
 
     fun onRestoreInstanceState(inState: Bundle, prefix: String) {
         width = inState.getInt(prefix + "_width")
         height = inState.getInt(prefix + "_height")
         paintType = WordType.valueOf(inState.getString(prefix + "_paint_type"))
-        words = Array<Array<Word>>(height) {
-            i ->
-            Array<Word>(width) {
-                j ->
-                Word(inState, prefix + "_word_" + i + "_" + j)
-            }
-        }
+        words = Array(width, { r -> Array(height, { c -> Word(r, c) })})
+        words.flatten().forEachIndexed { index, word ->  word.onRestoreInstanceState(inState, prefix + "_word_" + index) }
     }
 }

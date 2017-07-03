@@ -12,6 +12,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.AutoCompleteTextView
+import android.widget.TextView
 
 
 class Card : AutoCompleteTextView {

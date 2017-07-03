@@ -116,19 +116,21 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
         val wordCount = words.flatten().filter { it != "" }.size
         if (wordCount <= 12) return
 
-        if (savedWords == null) {
+        var saved = savedWords
+        if (saved == null) {
             savedWords = words
+            saved = words
         } else {
-            for ((savedRow, row) in savedWords.zip(words)) {
+            for ((savedRow, row) in saved.zip(words)) {
                 for (i in 0 until row.size) {
                     if (row[i] != "") savedRow[i] = row[i];
                 }
             }
         }
 
-        val wordCount2 = savedWords!!.flatten().filter { it != "" }.size
+        val wordCount2 = saved.flatten().filter { it != "" }.size
         if (wordCount2 == 25) {
-            sendData(savedWords!!)
+            sendData(saved)
         }
     }
 

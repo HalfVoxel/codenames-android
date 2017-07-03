@@ -8,16 +8,17 @@ import com.android.volley.toolbox.Volley
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import org.json.JSONObject
+import java.net.URI
 import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 
 class Bot(val board: Board) {
 
     fun getClue(team: Team, requestQueue: RequestQueue, clueList: ClueList?, onFinish: (Clue) -> Any) {
-        val words = board.words.flatten().filter { !it.contacted }.toTypedArray()
+        val words = board.words.flatten().filter { !it.contacted.value }.toTypedArray()
 
         var colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
-        var wordsString = words.joinToString(separator = ",", transform = { w -> w.word.toLowerCase() })
+        var wordsString = words.joinToString(separator = ",", transform = { w -> w.word.value.toLowerCase() })
         var hintedString = ""
         if (clueList != null) {
             val hintedWords = mutableSetOf<String>()
