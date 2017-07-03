@@ -89,7 +89,7 @@ class Board(var layout: TableLayout,
             blueSpiesRemainingView.text = remainingCount[WordType.Blue.ordinal].toString()
             civiliansRemainingView.text = remainingCount[WordType.Civilian.ordinal].toString()
             remainingLayout.invalidate()
-        }, *words.flatten().map { it.contacted }.toTypedArray())
+        }, gameState, *words.flatten().map { it.contacted }.toTypedArray(), *words.flatten().map { it.type }.toTypedArray())
 
         initializeFocus(cards)
     }

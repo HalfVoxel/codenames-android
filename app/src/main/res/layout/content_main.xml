@@ -148,8 +148,8 @@
         android:padding="70dp"
         app:layout_constraintVertical_bias="0.4"
         app:layout_constraintTop_toBottomOf="@id/color_picker"
-        app:layout_constraintRight_toRightOf="@id/guidelineL1"
-        app:layout_constraintLeft_toLeftOf="@id/guidelineL1"
+        app:layout_constraintRight_toRightOf="@id/guideline1"
+        app:layout_constraintLeft_toLeftOf="@id/guideline1"
         app:layout_constraintBottom_toTopOf="@id/nextGameState"
         android:backgroundTint="#EEE" />
 
