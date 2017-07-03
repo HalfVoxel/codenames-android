@@ -33,16 +33,16 @@ class Bot(val board: Board) {
             }
         }
 
-        var url = "https://judge.omogenheap.se/codenames/api/1/clue?"
-        url += "engine=glove"
-        url += "&color=" + (if (team == Team.Red) "r" else "b")
-        url += "&colors=" + colorsString
-        url += "&words=" + wordsString
-        url += "&index=0"
-        url += "&count=10"
-        if(hintedString.length == 0)
+        var query = "engine=glove"
+        query += "&color=" + (if (team == Team.Red) "r" else "b")
+        query += "&colors=" + colorsString
+        query += "&words=" + wordsString
+        query += "&index=0"
+        query += "&count=10"
+        if(hintedString.isEmpty())
             hintedString = "none"
-        url += "&hinted_words=" + hintedString
+        query += "&hinted_words=" + hintedString
+        val url = URI("https", "judge.omogenheap.se", "/codenames/api/1/clue", query, "").toASCIIString()
 
         val stringRequest = StringRequest(Request.Method.GET, url,
                 {
