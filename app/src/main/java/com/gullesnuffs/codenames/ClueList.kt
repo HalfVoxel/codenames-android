@@ -24,7 +24,7 @@ class ClueList(var listView: RecyclerView,
         clueNumberView.setTextColor(context.getResources().getColor(clue.getColor()))
 
         listView.adapter.notifyItemInserted(0)
-        listView.scrollToPosition(0);
+        listView.scrollToPosition(0)
     }
 
     fun clear() {

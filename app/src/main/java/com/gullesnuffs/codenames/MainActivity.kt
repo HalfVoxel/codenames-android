@@ -93,17 +93,21 @@ class MainActivity : AppCompatActivity() {
         val clueListAdapter = ClueListAdapter(clueList!!, { clue ->
             var targetWords = clue.getTargetWords()
             if (clue == currentTargetClue) {
-                targetWords = mutableListOf<String>()
                 currentTargetClue = null
+                board!!.displayScores = false
             } else {
                 currentTargetClue = clue
-            }
-            for (i in 0 until board!!.height) {
-                for (j in 0 until board!!.width) {
-                    val word = board!!.words[i][j]
-                    word.isTarget = word.word.toLowerCase() in targetWords
+                board!!.displayScores = true
+
+                for (i in 0 until board!!.height) {
+                    for (j in 0 until board!!.width) {
+                        val word = board!!.words[i][j]
+                        word.isTarget = word.word.toLowerCase() in targetWords
+                        word.score = clue.getWordScore(word.word.toLowerCase())
+                    }
                 }
             }
+
             board!!.updateLayout()
         })
         clueListView.adapter = clueListAdapter;
@@ -195,6 +199,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             board!!.updateLayout()
+            board!!.flashCards()
         }
 
         updateLayout()
@@ -210,6 +215,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateLayout()
+        board!!.resetCardOverrideColors()
     }
 
     fun addClue(clue: Clue) {

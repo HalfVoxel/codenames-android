@@ -39,6 +39,17 @@ class Clue(var word: String, var number: Int, var team: Team) {
         explanation!!.onRestoreInstanceState(inState, prefix + "_explanation")
     }
 
+    fun getWordScore(word : String): Float {
+        val exp = explanation ?: return 0f
+
+        for (i in 0 until exp.words.size) {
+            if (exp.words[i] == word) {
+                return exp.scores[i].toFloat()
+            }
+        }
+
+        return 0f
+    }
     fun getTargetWords(): List<String> {
         val wordList = mutableListOf<String>()
         if (explanation == null)

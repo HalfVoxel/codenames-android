@@ -12,8 +12,6 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.AutoCompleteTextView
-import android.widget.LinearLayout
-import android.graphics.Color.parseColor
 
 
 class Card : AutoCompleteTextView {
@@ -37,6 +35,8 @@ class Card : AutoCompleteTextView {
             refreshDrawableState()
         }
 
+    var borderOverrideColor: Int = Color.argb(0, 255, 255, 255)
+    var surfaceOverrideColor: Int = Color.argb(0, 255, 255, 255)
     var editable = true
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -72,17 +72,62 @@ class Card : AutoCompleteTextView {
     }
 
     fun colorLerp(a: Int, b: Int, fraction: Float): Int {
-        val hsv1 = FloatArray(3)
+        /*val hsv1 = FloatArray(3)
         val hsv2 = FloatArray(3)
         Color.colorToHSV(a, hsv1)
         Color.colorToHSV(b, hsv2)
         for (i in 0..2) hsv1[i] = hsv1[i] * (1 - fraction) + hsv2[i] * fraction
         val alpha = Color.alpha(a) * (1 - fraction) + Color.alpha(b) * fraction
-        return Color.HSVToColor(alpha.toInt(), hsv1)
+        return Color.HSVToColor(alpha.toInt(), hsv1)*/
+
+        val ca = Color.alpha(a)/255f * (1f - Color.alpha(b)/255f*fraction)
+        val cb = Color.alpha(b)/255f * fraction
+        val alpha = Color.alpha(a) * ca + Color.alpha(b) * cb
+        val red = Color.red(a) * ca + Color.red(b) * cb
+        val green = Color.green(a) * ca + Color.green(b) * cb
+        val blue = Color.blue(a) * ca + Color.blue(b) * cb
+        return Color.argb(alpha.toInt(), red.toInt(), green.toInt(), blue.toInt())
+
+        //val a2 = colorScale(a, )
+        //val b2 = colorScale(b, )
+        //return colorAdd(a2, b2)
+        /*val denominator = Color.alpha(a)/255f + fraction*(Color.alpha(b)/255f)*(1f - Color.alpha(a)/255f)
+        if (denominator == 0f) return 0
+        val a2 = colorScale(a, Color.alpha(a)/255f / denominator)
+        val b2 = colorScale(b, fraction*Color.alpha(b)/255f*(1 - Color.alpha(a)/255f) / denominator)
+        val res = a2 + b2
+        val alpha = Color.alpha(a)/255f + fraction*(Color.alpha(b)/255f) * (1f - Color.alpha(a)/255f)
+        return Color.argb((alpha*255).toInt(), Color.red(res), Color.green(res), Color.blue(res))*/
+
+        /*val alpha = Color.alpha(a) * (1 - fraction) + Color.alpha(b) * fraction
+        val red = Color.red(a) * (1 - fraction) + Color.red(b) * fraction
+        val green = Color.green(a) * (1 - fraction) + Color.green(b) * fraction
+        val blue = Color.blue(a) * (1 - fraction) + Color.blue(b) * fraction
+        return Color.argb(alpha.toInt(), red.toInt(), green.toInt(), blue.toInt())*/
     }
 
-    fun colorMultiply(color: Int, multiplier: Float): Int {
+    fun colorScale(color: Int, multiplier: Float): Int {
         return Color.argb(Color.alpha(color), (Color.red(color) * multiplier).toInt(), (Color.green(color) * multiplier).toInt(), (Color.blue(color) * multiplier).toInt())
+    }
+
+    fun colorAdd(a: Int, b : Int): Int {
+        return Color.argb(Color.alpha(a) + Color.alpha(b), Color.red(a) + Color.red(b), Color.green(a) + Color.green(b), Color.blue(a) + Color.blue(b))
+    }
+
+    fun colorMultiply(a: Int, b : Int): Int {
+        return Color.argb(Color.alpha(a) * Color.alpha(b) / 255, Color.red(a) * Color.red(b) / 255, Color.green(a) * Color.green(b) / 255, Color.blue(a) * Color.blue(b) / 255)
+    }
+
+    fun brighten(color: Int, amount: Float): Int {
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color, hsv)
+        hsv[2] = hsv[2] + (1 - hsv[2]) * amount
+        hsv[1] *= 1 - amount
+        return Color.HSVToColor(Color.alpha(color), hsv)
+    }
+
+    fun brightness(color: Int): Float {
+        return (Color.red(color) + Color.green(color) + Color.blue(color)) / (255f*3)
     }
 
     val paint = Paint()
@@ -91,14 +136,20 @@ class Card : AutoCompleteTextView {
         val rf = RectF(r.left.toFloat(), r.top.toFloat(), r.right.toFloat(), r.bottom.toFloat())
 
         val color = backgroundTintList.getColorForState(drawableState, android.R.color.transparent)
-        paint.color = colorMultiply(color, 0.6f)
+        paint.color = colorScale(color, 0.6f)
+        paint.color = colorLerp(paint.color, borderOverrideColor, Color.alpha(borderOverrideColor)/255f)
+
         paint.style = Paint.Style.FILL
         var radius = 10f
         canvas.drawRoundRect(rf, radius, radius, paint)
         val inset = 5f
         rf.inset(inset, inset)
         radius -= inset * 0.5f
-        paint.color = color
+        paint.color = colorLerp(color, surfaceOverrideColor, Color.alpha(surfaceOverrideColor)/255f)
+
+        // setTextColor(if (brightness(paint.color) > 0.8f) Color.BLACK else Color.WHITE)
+
+        setShadowLayer(10f, 0f, 0f, Color.argb((200 * brightness(paint.color)).toInt(), 0, 0, 0))
         canvas.drawRoundRect(rf, radius, radius, paint)
         super.onDraw(canvas)
     }

@@ -18,6 +18,7 @@ enum class WordType {
 class Word(var word: String, var type: WordType, var contacted: Boolean) {
 
     var isTarget = false
+    var score = 0f
 
     constructor(inState: Bundle, prefix: String) : this(
             inState.getString(prefix + "_word"),

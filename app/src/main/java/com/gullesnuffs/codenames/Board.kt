@@ -1,13 +1,10 @@
 package com.gullesnuffs.codenames
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
-import android.text.Editable
-import android.text.InputFilter
-import android.text.TextWatcher
 import android.widget.*
 import android.view.LayoutInflater
 import android.view.View
@@ -27,11 +24,14 @@ class Board(var words: Array<Array<Word>>,
     val redSpiesRemainingView = remainingLayout.findViewById(R.id.red_spies_remaining) as TextView
     val blueSpiesRemainingView = remainingLayout.findViewById(R.id.blue_spies_remaining) as TextView
     val civiliansRemainingView = remainingLayout.findViewById(R.id.civilians_remaining) as TextView
+    var currentAnimationSet : AnimatorSet
+    var displayScores = false
 
     init {
         val inflater = LayoutInflater.from(context)
 
         layout.removeAllViews()
+        currentAnimationSet = AnimatorSet()
 
         for (i in 0 until height) {
             val row: TableRow = TableRow(context)
@@ -84,7 +84,36 @@ class Board(var words: Array<Array<Word>>,
         }
     }
 
+    fun flashCards() {
+        currentAnimationSet.cancel()
+        currentAnimationSet = AnimatorSet()
+        cards.zip(words.flatten()).forEach { (card, word) ->
+            val anim = ObjectAnimator.ofArgb(card, "borderOverrideColor", Color.argb(180, 255, 255, 255), Color.argb(0, 255, 255, 255))
+            anim.duration = 400
+            anim.startDelay = (Math.random() * 200).toLong()
+            anim.addUpdateListener { card.invalidate() }
+            currentAnimationSet.play(anim)
+        }
+        currentAnimationSet.start()
+    }
+
+    fun resetCardOverrideColors() {
+        currentAnimationSet.cancel()
+        currentAnimationSet = AnimatorSet()
+        cards.zip(words.flatten()).forEach { (card, word) ->
+            val anim = ObjectAnimator.ofArgb(card, "borderOverrideColor", card.borderOverrideColor, Color.argb(0, 255, 255, 255))
+            anim.duration = 400
+            anim.startDelay = (Math.random() * 200).toLong()
+            anim.addUpdateListener { card.invalidate() }
+            currentAnimationSet.play(anim)
+        }
+        currentAnimationSet.start()
+    }
+
     fun updateLayout() {
+        val maxScore = words.flatten().maxBy { it.score }!!.score
+        currentAnimationSet.cancel()
+        currentAnimationSet = AnimatorSet()
         val remainingCount = intArrayOf(0, 0, 0, 0)
         cards.zip(words.flatten()).forEach { (card, word) ->
             if (!word.contacted) {
@@ -98,12 +127,32 @@ class Board(var words: Array<Array<Word>>,
                 card.state = word.type
             }
 
-            if (word.isTarget) {
-                (card as TextView).setTextColor(context.resources.getColor(R.color.card_target_text_color))
-            } else {
-                (card as TextView).setTextColor(context.resources.getColor(R.color.card_text_color))
+            var targetColor1 = if(word.isTarget) Color.WHITE else Color.argb(255, 0, 0, 0)
+            var alpha = Math.max(0f, word.score / maxScore)
+            // Make things more distinct in the UI
+            if (alpha < 0.5) alpha = 0f
+            alpha *= alpha
+            alpha = Math.round(alpha * 3) / 3f
+            var targetColor2 = Color.argb(255, (alpha * 255f).toInt(), (alpha * 255f).toInt(), (alpha * 255f).toInt())
+
+            targetColor2 = card.colorMultiply(targetColor2, card.brighten(context.resources.getColor(word.getColor(GameState.EnterColors)), 0.1f))
+            if (!displayScores) {
+                targetColor1 = Color.argb(0, 0, 0, 0)
+                targetColor2 = Color.argb(0, 0, 0, 0)
             }
+
+            val anim = ObjectAnimator.ofArgb(card, "borderOverrideColor", card.borderOverrideColor, targetColor1)
+            anim.duration = 400
+            anim.startDelay = ((1 - alpha) * 100).toLong()
+            anim.addUpdateListener { card.invalidate() }
+            currentAnimationSet.play(anim)
+
+            val anim2 = ObjectAnimator.ofArgb(card, "surfaceOverrideColor", card.surfaceOverrideColor, targetColor2)
+            anim2.duration = anim.duration
+            anim2.startDelay = anim.startDelay
+            currentAnimationSet.play(anim2)
         }
+        currentAnimationSet.start()
 
         layout.invalidate()
 
