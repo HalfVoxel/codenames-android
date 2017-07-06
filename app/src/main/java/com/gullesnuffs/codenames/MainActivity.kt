@@ -211,6 +211,7 @@ class MainActivity : AppCompatActivity() {
             it.score = 0f
             it.isTarget = false
         }
+        board!!.resetCardOverrideColors()
     }
 
     override fun onBackPressed() {
