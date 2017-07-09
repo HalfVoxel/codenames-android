@@ -214,10 +214,6 @@ class MainActivity : AppCompatActivity() {
         board!!.resetCardOverrideColors()
     }
 
-    fun clearCardFocus() {
-        nextGameState.requestFocus()
-    }
-
     override fun onBackPressed() {
         if (gameState.value == GameState.EnterColors) {
             gameState.value = GameState.EnterWords
@@ -295,7 +291,12 @@ class MainActivity : AppCompatActivity() {
                 optionsMenu?.findItem(R.id.action_new_game)?.setVisible(true)
             }
         }
-        clearCardFocus()
+
+        var cursorVisible = (gameState.value == GameState.EnterWords)
+
+        for(card in board!!.cards){
+            card.setCursorVisible(cursorVisible)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
