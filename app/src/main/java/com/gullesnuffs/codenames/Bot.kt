@@ -20,12 +20,16 @@ class Bot(val board: Board) {
         var colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
         var wordsString = words.joinToString(separator = ",", transform = { w -> w.word.value.toLowerCase() })
         var hintedString = ""
+        var oldClueString = ""
         if (clueList != null) {
             val hintedWords = mutableSetOf<String>()
             for (clue in clueList.list) {
                 for (word in clue.getTargetWords()){
                     hintedWords.add(word)
                 }
+                if(oldClueString.length > 0)
+                    oldClueString += ","
+                oldClueString += clue.word
             }
             for (word in hintedWords){
                 if(hintedString.length > 0)
@@ -41,8 +45,11 @@ class Bot(val board: Board) {
         query += "&index=0"
         query += "&count=10"
         if(hintedString.isEmpty())
-            hintedString = "none"
+            hintedString = "no_words"
         query += "&hinted_words=" + hintedString
+        if(oldClueString.isEmpty())
+            oldClueString = "no_words"
+        query += "&old_clues=" + oldClueString
         val url = URI("https", "judge.omogenheap.se", "/codenames/api/1/clue", query, "").toASCIIString()
 
         val stringRequest = StringRequest(Request.Method.GET, url,
