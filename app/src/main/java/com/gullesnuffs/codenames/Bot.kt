@@ -38,7 +38,17 @@ class Bot(val board: Board) {
             }
         }
 
-        var query = "engine=glove"
+        var engine = "glove"
+
+        // Glove only contains single words, so we have to use a different engine if any of
+        // the words are actually two words
+        for(word in words){
+            if(" " in word.word.value){
+                engine = "conceptnet"
+            }
+        }
+
+        var query = "engine=" + engine
         query += "&color=" + (if (team == Team.Red) "r" else "b")
         query += "&colors=" + colorsString
         query += "&words=" + wordsString
