@@ -248,6 +248,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
             override fun getParams(): Map<String, String> {
                 val params = HashMap<String, String>()
                 params.put("size", "5x5")
+                params.put("lang", "eng")
                 return params
             }
 
