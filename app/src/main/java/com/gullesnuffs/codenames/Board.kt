@@ -203,7 +203,6 @@ class Board(var layout: TableLayout,
         width = inState.getInt(prefix + "_width")
         height = inState.getInt(prefix + "_height")
         paintType = WordType.valueOf(inState.getString(prefix + "_paint_type"))
-        words = Array(width, { r -> Array(height, { c -> Word(r, c) })})
         words.flatten().forEachIndexed { index, word ->  word.onRestoreInstanceState(inState, prefix + "_word_" + index) }
     }
 }

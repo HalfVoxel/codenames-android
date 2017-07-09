@@ -296,6 +296,8 @@ class MainActivity : AppCompatActivity() {
 
         for(card in board!!.cards){
             card.setCursorVisible(cursorVisible)
+            card.setFocusable(cursorVisible)
+            card.setFocusableInTouchMode(cursorVisible)
         }
     }
 
@@ -340,7 +342,7 @@ class MainActivity : AppCompatActivity() {
 
     // invoked when the activity may be temporarily destroyed, save the instance state here
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString("game_state", gameState.toString());
+        outState.putString("game_state", gameState.value.toString());
         board?.onSaveInstanceState(outState, "board")
         super.onSaveInstanceState(outState);
     }
