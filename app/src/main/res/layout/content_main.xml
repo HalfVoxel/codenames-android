@@ -178,6 +178,8 @@
         android:elevation="4dp"
         app:fabSize="mini"
         app:backgroundTint="#EEEEEE"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         />
 
     <LinearLayout
