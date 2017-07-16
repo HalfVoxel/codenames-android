@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#b71c1c</color>
     <color name="colorPrimaryDark">#801313</color>
-    <color name="colorAccent">#CCCCCC</color>
+    <color name="colorAccent">#CCC</color>
     <color name="navigation_enabled">#801313</color>
     <color name="navigation_disabled">#7c4f4f</color>
     <color name="red_team_color">#e41a1c</color>
@@ -13,4 +13,5 @@
     <color name="main_background">#212121</color>
     <color name="card_text_color">#CCC</color>
     <color name="card_target_text_color">#4F2</color>
+    <color name="dialog_button_text_color">#333</color>
 </resources>
