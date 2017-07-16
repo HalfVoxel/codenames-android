@@ -47,11 +47,7 @@ class ClueList(var listView: RecyclerView,
         unselect()
         for(i in 0 until list.size){
             if(list[i] == clue){
-                if(clue.team == Team.Red) {
-                    listView.adapter.notifyItemChanged(i, R.drawable.selected_clue_red_outline)
-                } else {
-                    listView.adapter.notifyItemChanged(i, R.drawable.selected_clue_blue_outline)
-                }
+                listView.adapter.notifyItemChanged(i, clue.team)
             }
         }
         selectedClue = clue
