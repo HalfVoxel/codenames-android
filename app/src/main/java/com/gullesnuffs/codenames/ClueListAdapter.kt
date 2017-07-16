@@ -24,8 +24,11 @@ class ClueListAdapter(val clueList: ClueList, val itemClick: (Clue) -> Unit) :
             if(payload[0] == Team.Red){
                 holder.itemView.setBackgroundResource(R.drawable.selected_clue_red_outline)
             }
-            else if(payload[0] == Team.Red){
+            else if(payload[0] == Team.Blue){
                 holder.itemView.setBackgroundResource(R.drawable.selected_clue_blue_outline)
+            }
+            else if(payload[0] == "unselected"){
+                holder.itemView.setBackgroundResource(R.drawable.unselected_clue_outline)
             }
         }
     }

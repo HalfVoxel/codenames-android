@@ -37,7 +37,7 @@ class ClueList(var listView: RecyclerView,
     fun unselect(){
         for(i in 0 until list.size){
             if(list[i] == selectedClue){
-                listView.adapter.notifyItemChanged(i, R.drawable.unselected_clue_outline)
+                listView.adapter.notifyItemChanged(i, "unselected")
             }
         }
         selectedClue = null
