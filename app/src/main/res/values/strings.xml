@@ -10,14 +10,14 @@
     <string name="new_game_no">No</string>
     <string name="pref_optimism_title">Clue difficulty</string>
     <string-array name="pref_optimism_entries">
-        <item>Easy</item>
-        <item>Medium</item>
-        <item>Hard</item>
+        <item>Safe clues</item>
+        <item>Medium clues</item>
+        <item>Risky clues</item>
     </string-array>
     <string-array name="pref_optimism_values">
-        <item>Easy</item>
-        <item>Medium</item>
-        <item>Hard</item>
+        <item>easy</item>
+        <item>medium</item>
+        <item>hard</item>
     </string-array>
-    <string name="pref_optimism_default">Easy</string>
+    <string name="pref_optimism_default">easy</string>
 </resources>
