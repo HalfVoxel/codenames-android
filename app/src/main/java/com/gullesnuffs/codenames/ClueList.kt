@@ -8,6 +8,7 @@ import android.widget.TextView
 class ClueList(var listView: RecyclerView,
                val context: Context) {
     val list = mutableListOf<Clue>()
+    var selectedClue : Clue? = null
 
     fun addClue(clue: Clue) {
         list.add(0, clue)
@@ -33,4 +34,26 @@ class ClueList(var listView: RecyclerView,
         listView.adapter.notifyItemRangeRemoved(0, oldSize)
     }
 
+    fun unselect(){
+        for(i in 0 until list.size){
+            if(list[i] == selectedClue){
+                listView.adapter.notifyItemChanged(i, R.drawable.unselected_clue_outline)
+            }
+        }
+        selectedClue = null
+    }
+
+    fun setSelected(clue: Clue) {
+        unselect()
+        for(i in 0 until list.size){
+            if(list[i] == clue){
+                if(clue.team == Team.Red) {
+                    listView.adapter.notifyItemChanged(i, R.drawable.selected_clue_red_outline)
+                } else {
+                    listView.adapter.notifyItemChanged(i, R.drawable.selected_clue_blue_outline)
+                }
+            }
+        }
+        selectedClue = clue
+    }
 }

@@ -18,6 +18,13 @@ class ClueListAdapter(val clueList: ClueList, val itemClick: (Clue) -> Unit) :
         holder.bindClue(clueList.list[position])
     }
 
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payload: List<Any>) {
+        holder.bindClue(clueList.list[position])
+        if(payload.size > 0) {
+            holder.itemView.setBackgroundResource(payload[0] as Int)
+        }
+    }
+
     override fun getItemCount() = clueList.list.size
 
     class ViewHolder(view: View, val itemClick: (Clue) -> Unit) : RecyclerView.ViewHolder(view) {
@@ -31,6 +38,7 @@ class ClueListAdapter(val clueList: ClueList, val itemClick: (Clue) -> Unit) :
                 itemView.clue_number.setTextColor(
                         itemView.resources.getColor(clue.getColor()))
                 itemView.setOnClickListener { itemClick(this) }
+
             }
         }
     }

@@ -93,6 +93,7 @@ class MainActivity : AppCompatActivity() {
             if (clue == currentTargetClue) {
                 currentTargetClue = null
                 board!!.displayScores = false
+                clueList!!.unselect()
             } else {
                 currentTargetClue = clue
                 board!!.displayScores = true
@@ -104,6 +105,7 @@ class MainActivity : AppCompatActivity() {
                         word.score = clue.getWordScore(word.word.value.toLowerCase())
                     }
                 }
+                clueList!!.setSelected(clue)
             }
             board!!.animateCardScores()
         })
