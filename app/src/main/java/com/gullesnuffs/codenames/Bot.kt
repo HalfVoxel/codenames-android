@@ -2,19 +2,15 @@ package com.gullesnuffs.codenames
 
 import android.util.Log
 import com.android.volley.Request
-import com.android.volley.VolleyError
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.android.volley.RequestQueue
-import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
 import org.json.JSONObject
 import java.net.URI
-import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 
 class Bot(val board: Board) {
 
-    fun getClue(team: Team, requestQueue: RequestQueue, clueList: ClueList?, onFinish: (Clue) -> Any) {
+    fun getClue(team: Team, requestQueue: RequestQueue, clueList: ClueList?, difficulty: String, onFinish: (Clue) -> Any) {
         val words = board.words.flatten().filter { !it.contacted.value }.toTypedArray()
 
         var colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
@@ -24,9 +20,7 @@ class Bot(val board: Board) {
         if (clueList != null) {
             val hintedWords = mutableSetOf<String>()
             for (clue in clueList.list) {
-                for (word in clue.getTargetWords()){
-                    hintedWords.add(word)
-                }
+                hintedWords += clue.getTargetWords()
                 if(oldClueString.length > 0)
                     oldClueString += ","
                 oldClueString += clue.word
@@ -60,6 +54,7 @@ class Bot(val board: Board) {
         if(oldClueString.isEmpty())
             oldClueString = "no_words"
         query += "&old_clues=" + oldClueString
+        query += "&difficulty=" + difficulty
         val url = URI("https", "judge.omogenheap.se", "/codenames/api/1/clue", query, "").toASCIIString()
 
         val stringRequest = StringRequest(Request.Method.GET, url,

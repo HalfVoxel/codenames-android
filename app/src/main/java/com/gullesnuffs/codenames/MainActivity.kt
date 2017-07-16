@@ -23,6 +23,8 @@ import kotlinx.android.synthetic.main.content_main.*
 import android.content.DialogInterface
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import android.support.constraint.ConstraintSet
 import android.support.transition.AutoTransition
 import android.support.transition.TransitionManager
@@ -133,16 +135,24 @@ class MainActivity : AppCompatActivity() {
             board!!.paintType = WordType.Assassin
         }
 
+        var prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         get_red_clue_button.setOnClickListener { _ ->
             val bot = Bot(board!!)
-            bot.getClue(Team.Red, requestQueue!!, clueList, { clue: Clue ->
+            bot.getClue(Team.Red,
+                    requestQueue!!,
+                    clueList,
+                    prefs.getString("pref_optimism", "Easy"), { clue: Clue ->
                 addClue(clue)
             })
         }
 
         get_blue_clue_button.setOnClickListener { _ ->
             val bot = Bot(board!!)
-            bot.getClue(Team.Blue, requestQueue!!, clueList, { clue: Clue ->
+            bot.getClue(Team.Blue,
+                    requestQueue!!,
+                    clueList,
+                    prefs.getString("pref_optimism", "Easy"), { clue: Clue ->
                 addClue(clue)
             })
         }
