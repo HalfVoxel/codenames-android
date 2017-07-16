@@ -37,7 +37,7 @@ class ClueList(var listView: RecyclerView,
     fun unselect(){
         for(i in 0 until list.size){
             if(list[i] == selectedClue){
-                listView.adapter.notifyItemChanged(i, "unselected")
+                listView.adapter.notifyItemChanged(i)
             }
         }
         selectedClue = null
@@ -47,7 +47,7 @@ class ClueList(var listView: RecyclerView,
         unselect()
         for(i in 0 until list.size){
             if(list[i] == clue){
-                listView.adapter.notifyItemChanged(i, clue.team)
+                listView.adapter.notifyItemChanged(i)
             }
         }
         selectedClue = clue
