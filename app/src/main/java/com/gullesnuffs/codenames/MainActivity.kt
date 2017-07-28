@@ -140,22 +140,28 @@ class MainActivity : AppCompatActivity() {
         var prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         get_red_clue_button.setOnClickListener { _ ->
+            val dialog = ClueDialog()
+            dialog.team = Team.Red
+            dialog.show(getFragmentManager(), "clue")
             val bot = Bot(board!!)
             bot.getClue(Team.Red,
                     requestQueue!!,
                     clueList,
                     prefs.getString("pref_optimism", "Easy"), { clue: Clue ->
-                addClue(clue)
+                addClue(dialog, clue)
             })
         }
 
         get_blue_clue_button.setOnClickListener { _ ->
+            val dialog = ClueDialog()
+            dialog.team = Team.Blue
+            dialog.show(getFragmentManager(), "clue")
             val bot = Bot(board!!)
             bot.getClue(Team.Blue,
                     requestQueue!!,
                     clueList,
                     prefs.getString("pref_optimism", "Easy"), { clue: Clue ->
-                addClue(clue)
+                addClue(dialog, clue)
             })
         }
 
@@ -239,11 +245,9 @@ class MainActivity : AppCompatActivity() {
         board!!.resetCardOverrideColors()
     }
 
-    fun addClue(clue: Clue) {
-        val dialog = ClueDialog()
+    fun addClue(dialog: ClueDialog, clue: Clue) {
         clueList!!.addClue(clue)
         dialog.clue = clue
-        dialog.show(getFragmentManager(), "clue")
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
