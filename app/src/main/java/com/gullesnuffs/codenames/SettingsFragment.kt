@@ -15,6 +15,11 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
         if (pref is ListPreference) {
             pref.setSummary(pref.entry)
         }
+
+        val inappropriate = findPreference("pref_inappropriate")
+        if (inappropriate is ListPreference) {
+            inappropriate.setSummary(inappropriate.entry)
+        }
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {

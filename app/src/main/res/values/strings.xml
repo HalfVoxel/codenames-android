@@ -20,4 +20,17 @@
         <item>hard</item>
     </string-array>
     <string name="pref_optimism_default">easy</string>
+
+    <string name="pref_inappropriate_title">Word filter</string>
+    <string-array name="pref_inappropriate_entries">
+        <item>Block inappropriate words</item>
+        <item>Allow inappropriate words</item>
+        <item>Prefer inappropriate words</item>
+    </string-array>
+    <string-array name="pref_inappropriate_values">
+        <item>block</item>
+        <item>allow</item>
+        <item>boost</item>
+    </string-array>
+    <string name="pref_inappropriate_default">block</string>
 </resources>

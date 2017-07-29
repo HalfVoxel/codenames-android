@@ -10,7 +10,7 @@ import java.net.URI
 
 class Bot(val board: Board) {
 
-    fun getClue(team: Team, requestQueue: RequestQueue, clueList: ClueList?, difficulty: String, onFinish: (Clue) -> Any) {
+    fun getClue(team: Team, requestQueue: RequestQueue, clueList: ClueList?, difficulty: String, inappropriateMode: String, onFinish: (Clue) -> Any) {
         val words = board.words.flatten().filter { !it.contacted.value }.toTypedArray()
 
         var colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
@@ -54,6 +54,7 @@ class Bot(val board: Board) {
         if(oldClueString.isEmpty())
             oldClueString = "no_words"
         query += "&old_clues=" + oldClueString
+        query += "&inappropriate=" + inappropriateMode
         query += "&difficulty=" + difficulty
         val url = URI("https", "judge.omogenheap.se", "/codenames/api/1/clue", query, "").toASCIIString()
 

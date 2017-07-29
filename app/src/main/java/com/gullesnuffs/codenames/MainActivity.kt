@@ -33,6 +33,8 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
+import com.gullesnuffs.codenames.R.string.pref_inappropriate_default
+import com.gullesnuffs.codenames.R.string.pref_optimism_default
 import kotlinx.android.synthetic.main.clue_dialog.view.*
 import java.util.*
 
@@ -137,32 +139,12 @@ class MainActivity : AppCompatActivity() {
             board!!.paintType = WordType.Assassin
         }
 
-        var prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         get_red_clue_button.setOnClickListener { _ ->
-            val dialog = ClueDialog()
-            dialog.team = Team.Red
-            dialog.show(getFragmentManager(), "clue")
-            val bot = Bot(board!!)
-            bot.getClue(Team.Red,
-                    requestQueue!!,
-                    clueList,
-                    prefs.getString("pref_optimism", "Easy"), { clue: Clue ->
-                addClue(dialog, clue)
-            })
+            getClue(Team.Red)
         }
 
         get_blue_clue_button.setOnClickListener { _ ->
-            val dialog = ClueDialog()
-            dialog.team = Team.Blue
-            dialog.show(getFragmentManager(), "clue")
-            val bot = Bot(board!!)
-            bot.getClue(Team.Blue,
-                    requestQueue!!,
-                    clueList,
-                    prefs.getString("pref_optimism", "Easy"), { clue: Clue ->
-                addClue(dialog, clue)
-            })
+            getClue(Team.Blue)
         }
 
         take_a_photo.setOnClickListener { _ ->
@@ -174,6 +156,22 @@ class MainActivity : AppCompatActivity() {
         react({ onGameStateChanged() }, gameState)
 
         init(gameState)
+    }
+
+    fun getClue(team: Team) {
+        var prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        val dialog = ClueDialog()
+        dialog.team = team
+        dialog.show(getFragmentManager(), "clue")
+        val bot = Bot(board!!)
+        bot.getClue(team,
+                requestQueue!!,
+                clueList,
+                prefs.getString("pref_optimism", resources.getString(pref_optimism_default)),
+                prefs.getString("pref_inappropriate", resources.getString(pref_inappropriate_default)),
+                { clue: Clue ->
+                    addClue(dialog, clue)
+                })
     }
 
     fun randomize() {

@@ -7,4 +7,11 @@
         android:entries="@array/pref_optimism_entries"
         android:entryValues="@array/pref_optimism_values"
         android:defaultValue="@string/pref_optimism_default" />
+    <ListPreference
+        android:key="pref_inappropriate"
+        android:title="@string/pref_inappropriate_title"
+        android:dialogTitle="@string/pref_inappropriate_title"
+        android:entries="@array/pref_inappropriate_entries"
+        android:entryValues="@array/pref_inappropriate_values"
+        android:defaultValue="@string/pref_inappropriate_default" />
 </PreferenceScreen>
