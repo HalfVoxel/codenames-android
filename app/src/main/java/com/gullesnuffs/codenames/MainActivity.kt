@@ -247,6 +247,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         board!!.displayScores = false
+        clueList!!.selectedClue.value = null
         board!!.resetCardOverrideColors()
     }
 
