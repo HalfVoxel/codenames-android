@@ -175,6 +175,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun randomize() {
+        instructions.requestFocus()
         val anim = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
         anim.duration = 500
         randomize.startAnimation(anim)
@@ -370,6 +371,7 @@ class MainActivity : AppCompatActivity() {
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             RequestCode.WordRecognition.ordinal -> {
+                instructions.requestFocus()
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     for (i in 0 until 5) {
                         for (j in 0 until 5) {
@@ -382,6 +384,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             RequestCode.GridRecognition.ordinal -> {
+                instructions.requestFocus()
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     for (i in 0 until 5) {
                         for (j in 0 until 5) {
