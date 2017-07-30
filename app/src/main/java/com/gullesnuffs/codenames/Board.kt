@@ -6,11 +6,10 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
+import android.widget.*
 
 
 class Board(var layout: TableLayout,
@@ -18,7 +17,7 @@ class Board(var layout: TableLayout,
             val autoCompleteAdapter: ArrayAdapter<String>,
             val gameState: Observable<GameState>,
             val context: Context) {
-    var words = Array(5, { r -> Array(5, { c -> Word(r, c) })})
+    var words = Array(5, { r -> Array(5, { c -> Word(r, c) }) })
     var paintType = WordType.Red
     var width: Int = words[0].size
     var height: Int = words.size
@@ -26,9 +25,9 @@ class Board(var layout: TableLayout,
     val redSpiesRemainingView = remainingLayout.findViewById(R.id.red_spies_remaining) as TextView
     val blueSpiesRemainingView = remainingLayout.findViewById(R.id.blue_spies_remaining) as TextView
     val civiliansRemainingView = remainingLayout.findViewById(R.id.civilians_remaining) as TextView
-    var currentAnimationSet : AnimatorSet
+    var currentAnimationSet: AnimatorSet
     var displayScores = false
-    var onClickCard : ((Word) -> Unit)? = null
+    var onClickCard: ((Word) -> Unit)? = null
 
     init {
         val inflater = LayoutInflater.from(context)
@@ -74,7 +73,7 @@ class Board(var layout: TableLayout,
 
         react({
             val remainingCount = intArrayOf(0, 0, 0, 0)
-            cards.zip(words.flatten()).forEach { (card, word) ->
+            cards.zip(words.flatten()).forEach { (_, word) ->
                 if (!word.contacted.value) {
                     remainingCount[word.type.value.ordinal]++
                 }
@@ -101,19 +100,19 @@ class Board(var layout: TableLayout,
         }
     }
 
-    fun flashCards(flash : ((Card,Word) -> Unit)?) {
+    fun flashCards(flash: ((Card, Word) -> Unit)?) {
         currentAnimationSet.cancel()
         currentAnimationSet = AnimatorSet()
         cards.zip(words.flatten()).forEach { (card, word) ->
             val anim = ObjectAnimator.ofArgb(card, "borderOverrideColor", Color.argb(180, 255, 255, 255), Color.argb(0, 255, 255, 255))
             anim.duration = 600
             //anim.startDelay = (Math.random() * 300).toLong()
-            val dr = word.row - (height-1)/2.0
-            val dc = word.column - (width-1)/2.0
+            //val dr = word.row - (height - 1) / 2.0
+            //val dc = word.column - (width - 1) / 2.0
             //anim.startDelay = ((dr*dr + dc*dc) * 30).toLong()
-            anim.startDelay = (word.column * 50 + Math.random()*50).toLong()
+            anim.startDelay = (word.column * 50 + Math.random() * 50).toLong()
             anim.addUpdateListener { card.invalidate() }
-            anim.addListener(object: Animator.AnimatorListener {
+            anim.addListener(object : Animator.AnimatorListener {
                 override fun onAnimationEnd(p0: Animator?) {
                 }
 
@@ -136,7 +135,7 @@ class Board(var layout: TableLayout,
     fun resetCardOverrideColors() {
         currentAnimationSet.cancel()
         currentAnimationSet = AnimatorSet()
-        cards.zip(words.flatten()).forEach { (card, word) ->
+        cards.forEach { card ->
             var anim = ObjectAnimator.ofArgb(card, "borderOverrideColor", card.borderOverrideColor, Color.argb(0, 255, 255, 255))
             anim.duration = 400
             anim.startDelay = (Math.random() * 200).toLong()
@@ -161,7 +160,7 @@ class Board(var layout: TableLayout,
         currentAnimationSet.cancel()
         currentAnimationSet = AnimatorSet()
         cards.zip(words.flatten()).forEach { (card, word) ->
-            var targetColor1 = if(word.isTarget) Color.WHITE else Color.argb(255, 0, 0, 0)
+            var targetColor1 = if (word.isTarget) Color.WHITE else Color.argb(255, 0, 0, 0)
             var alpha = Math.max(0f, word.score / maxScore)
             // Make things more distinct in the UI
             if (alpha < 0.5) alpha = 0f
@@ -206,13 +205,13 @@ class Board(var layout: TableLayout,
         outState.putInt(prefix + "_width", width)
         outState.putInt(prefix + "_height", height)
         outState.putString(prefix + "_paint_type", paintType.toString())
-        words.flatten().forEachIndexed { index, word ->  word.onSaveInstanceState(outState, prefix + "_word_" + index) }
+        words.flatten().forEachIndexed { index, word -> word.onSaveInstanceState(outState, prefix + "_word_" + index) }
     }
 
     fun onRestoreInstanceState(inState: Bundle, prefix: String) {
         width = inState.getInt(prefix + "_width")
         height = inState.getInt(prefix + "_height")
         paintType = WordType.valueOf(inState.getString(prefix + "_paint_type"))
-        words.flatten().forEachIndexed { index, word ->  word.onRestoreInstanceState(inState, prefix + "_word_" + index) }
+        words.flatten().forEachIndexed { index, word -> word.onRestoreInstanceState(inState, prefix + "_word_" + index) }
     }
 }

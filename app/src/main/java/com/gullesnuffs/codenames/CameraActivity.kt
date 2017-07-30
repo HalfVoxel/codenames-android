@@ -13,7 +13,7 @@ class CameraActivity : Activity() {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         cameraView = CameraView(this)
-        cameraView!!.requestCode = getIntent().extras["RequestCode"] as RequestCode
+        cameraView!!.requestCode = intent.extras["RequestCode"] as RequestCode
         setContentView(cameraView)
     }
 

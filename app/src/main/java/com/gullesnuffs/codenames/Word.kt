@@ -1,6 +1,5 @@
 package com.gullesnuffs.codenames
 
-import android.graphics.Color
 import android.os.Bundle
 
 enum class Team {
@@ -46,7 +45,7 @@ class Word(val row : Int, val column : Int) {
                 WordType.Assassin -> R.color.assassin_color
             }
         } else {
-            return R.color.not_contacted_color;
+            return R.color.not_contacted_color
         }
     }
 

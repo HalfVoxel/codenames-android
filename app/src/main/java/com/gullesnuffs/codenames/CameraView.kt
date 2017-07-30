@@ -26,8 +26,8 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (requestCode == RequestCode.WordRecognition) drawWordVisualization(canvas);
-        if (requestCode == RequestCode.GridRecognition) drawGridVisualization(canvas);
+        if (requestCode == RequestCode.WordRecognition) drawWordVisualization(canvas)
+        if (requestCode == RequestCode.GridRecognition) drawGridVisualization(canvas)
     }
 
     fun drawGridVisualization (canvas: Canvas) {
@@ -123,7 +123,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
         } else {
             for ((savedRow, row) in saved.zip(words)) {
                 for (i in 0 until row.size) {
-                    if (row[i] != "") savedRow[i] = row[i];
+                    if (row[i] != "") savedRow[i] = row[i]
                 }
             }
         }
@@ -166,7 +166,7 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
     }
 
     override fun processFrame(data: ByteArray) {
-        if (lastUploadTime.plusMillis(1000).isBeforeNow() && previousRequestDone) {
+        if (lastUploadTime.plusMillis(1000).isBeforeNow && previousRequestDone) {
             lastUploadTime = DateTime.now()
             uploadFrame(data)
         }
@@ -202,7 +202,6 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                 val grid = result.getJSONArray("grid")
                 val words = Array(grid.length(), { Array(grid.length(), { "" }) })
                 for (r in 0 until grid.length()) {
-                    val line = ArrayList<String>()
                     if (requestCode == RequestCode.WordRecognition) {
                         val jsonLine = grid.getJSONArray(r)
                         if (jsonLine.length() != grid.length()) throw Exception("Non-square matrix received from server")
@@ -268,9 +267,9 @@ internal class CameraView(context: Context) : CameraViewBase(context) {
                 data.putExtra(key, words[i][j])
             }
         }
-        data.setData(Uri.parse(""))
-        var activity = context as Activity
-        activity.setResult(RESULT_OK, data);
+        data.data = Uri.parse("")
+        val activity = context as Activity
+        activity.setResult(RESULT_OK, data)
         activity.finish()
     }
 }

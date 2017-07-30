@@ -8,9 +8,9 @@ import android.preference.PreferenceFragment
 class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState)
 
-        addPreferencesFromResource(R.xml.preferences);
+        addPreferencesFromResource(R.xml.preferences)
         val pref = findPreference("pref_optimism")
         if (pref is ListPreference) {
             pref.setSummary(pref.entry)

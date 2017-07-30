@@ -12,7 +12,6 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.AutoCompleteTextView
-import android.widget.TextView
 
 
 class Card : AutoCompleteTextView {
@@ -82,8 +81,8 @@ class Card : AutoCompleteTextView {
         val alpha = Color.alpha(a) * (1 - fraction) + Color.alpha(b) * fraction
         return Color.HSVToColor(alpha.toInt(), hsv1)*/
 
-        val ca = Color.alpha(a)/255f * (1f - Color.alpha(b)/255f*fraction)
-        val cb = Color.alpha(b)/255f * fraction
+        val ca = Color.alpha(a) / 255f * (1f - Color.alpha(b) / 255f * fraction)
+        val cb = Color.alpha(b) / 255f * fraction
         val alpha = Color.alpha(a) * ca + Color.alpha(b) * cb
         val red = Color.red(a) * ca + Color.red(b) * cb
         val green = Color.green(a) * ca + Color.green(b) * cb
@@ -112,11 +111,11 @@ class Card : AutoCompleteTextView {
         return Color.argb(Color.alpha(color), (Color.red(color) * multiplier).toInt(), (Color.green(color) * multiplier).toInt(), (Color.blue(color) * multiplier).toInt())
     }
 
-    fun colorAdd(a: Int, b : Int): Int {
+    fun colorAdd(a: Int, b: Int): Int {
         return Color.argb(Color.alpha(a) + Color.alpha(b), Color.red(a) + Color.red(b), Color.green(a) + Color.green(b), Color.blue(a) + Color.blue(b))
     }
 
-    fun colorMultiply(a: Int, b : Int): Int {
+    fun colorMultiply(a: Int, b: Int): Int {
         return Color.argb(Color.alpha(a) * Color.alpha(b) / 255, Color.red(a) * Color.red(b) / 255, Color.green(a) * Color.green(b) / 255, Color.blue(a) * Color.blue(b) / 255)
     }
 
@@ -129,7 +128,7 @@ class Card : AutoCompleteTextView {
     }
 
     fun brightness(color: Int): Float {
-        return (Color.red(color) + Color.green(color) + Color.blue(color)) / (255f*3)
+        return (Color.red(color) + Color.green(color) + Color.blue(color)) / (255f * 3)
     }
 
     val paint = Paint()
@@ -139,7 +138,7 @@ class Card : AutoCompleteTextView {
 
         val color = backgroundTintList.getColorForState(drawableState, android.R.color.transparent)
         paint.color = colorScale(color, 0.6f)
-        paint.color = colorLerp(paint.color, borderOverrideColor, Color.alpha(borderOverrideColor)/255f)
+        paint.color = colorLerp(paint.color, borderOverrideColor, Color.alpha(borderOverrideColor) / 255f)
 
         paint.style = Paint.Style.FILL
         var radius = 10f
@@ -147,18 +146,18 @@ class Card : AutoCompleteTextView {
         val inset = 5f
         rf.inset(inset, inset)
         radius -= inset * 0.5f
-        paint.color = colorLerp(color, surfaceOverrideColor, Color.alpha(surfaceOverrideColor)/255f)
+        paint.color = colorLerp(color, surfaceOverrideColor, Color.alpha(surfaceOverrideColor) / 255f)
 
-        setTextColor(colorLerp(Color.WHITE, textOverrideColor, Color.alpha(textOverrideColor)/255f))
+        setTextColor(colorLerp(Color.WHITE, textOverrideColor, Color.alpha(textOverrideColor) / 255f))
 
         setShadowLayer(10f, 0f, 0f, Color.argb((200 * brightness(paint.color)).toInt(), 0, 0, 0))
         canvas.drawRoundRect(rf, radius, radius, paint)
         super.onDraw(canvas)
     }
 
-    constructor(ctx: Context?) : super(ctx) {}
-    constructor(ctx: Context?, attrs: AttributeSet?) : super(ctx, attrs) {}
-    constructor(ctx: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(ctx, attrs, defStyleAttr) {}
+    constructor(ctx: Context?) : super(ctx)
+    constructor(ctx: Context?, attrs: AttributeSet?) : super(ctx, attrs)
+    constructor(ctx: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(ctx, attrs, defStyleAttr)
 
     override fun onCreateDrawableState(extraSpace: Int): IntArray {
         // Note: This will be called before state has been initialized

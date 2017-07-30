@@ -13,8 +13,8 @@ class Bot(val board: Board) {
     fun getClue(team: Team, requestQueue: RequestQueue, clueList: ClueList?, difficulty: String, inappropriateMode: String, onFinish: (Clue) -> Any) {
         val words = board.words.flatten().filter { !it.contacted.value }.toTypedArray()
 
-        var colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
-        var wordsString = words.joinToString(separator = ",", transform = { w -> w.word.value.toLowerCase() })
+        val colorsString = words.joinToString(separator = "", transform = { w -> w.getColorCode() })
+        val wordsString = words.joinToString(separator = ",", transform = { w -> w.word.value.toLowerCase() })
         var hintedString = ""
         var oldClueString = ""
         if (clueList != null) {

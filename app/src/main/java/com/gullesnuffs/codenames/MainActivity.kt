@@ -1,41 +1,33 @@
 package com.gullesnuffs.codenames
 
 import android.Manifest
-import android.annotation.TargetApi
+import android.app.Activity
 import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
+import android.preference.PreferenceManager
+import android.support.constraint.ConstraintSet
+import android.support.transition.AutoTransition
+import android.support.transition.TransitionManager
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.ArrayAdapter
 import android.widget.TableLayout
 import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
-import android.content.DialogInterface
-import android.app.Activity
-import android.content.Intent
-import android.content.SharedPreferences
-import android.preference.PreferenceManager
-import android.support.constraint.ConstraintSet
-import android.support.transition.AutoTransition
-import android.support.transition.TransitionManager
-import android.util.Log
-import android.view.animation.Animation
-import android.view.animation.RotateAnimation
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import com.gullesnuffs.codenames.R.string.pref_inappropriate_default
 import com.gullesnuffs.codenames.R.string.pref_optimism_default
-import kotlinx.android.synthetic.main.clue_dialog.view.*
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
 
 
@@ -88,7 +80,7 @@ class MainActivity : AppCompatActivity() {
 
         val clueListView = findViewById(R.id.clue_list) as RecyclerView
         this.clueListView = clueListView
-        clueListView.layoutManager = LinearLayoutManager(this);
+        clueListView.layoutManager = LinearLayoutManager(this)
         clueList = ClueList(clueListView, this)
         val clueListAdapter = ClueListAdapter(clueList!!, { clue ->
             val targetWords = clue.getTargetWords()
@@ -111,7 +103,7 @@ class MainActivity : AppCompatActivity() {
             }
             board.animateCardScores()
         })
-        clueListView.adapter = clueListAdapter;
+        clueListView.adapter = clueListAdapter
 
         board.onClickCard = {
             word ->
@@ -138,19 +130,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         place_red_spy_button.setOnClickListener { _ ->
-            board!!.paintType = WordType.Red
+            board.paintType = WordType.Red
         }
 
         place_blue_spy_button.setOnClickListener { _ ->
-            board!!.paintType = WordType.Blue
+            board.paintType = WordType.Blue
         }
 
         place_civilian_button.setOnClickListener { _ ->
-            board!!.paintType = WordType.Civilian
+            board.paintType = WordType.Civilian
         }
 
         place_assassin_button.setOnClickListener { _ ->
-            board!!.paintType = WordType.Assassin
+            board.paintType = WordType.Assassin
         }
 
         get_red_clue_button.setOnClickListener { _ ->
@@ -173,10 +165,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getClue(team: Team) {
-        var prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val dialog = ClueDialog()
         dialog.team = team
-        dialog.show(getFragmentManager(), "clue")
+        dialog.show(fragmentManager, "clue")
         val bot = Bot(board!!)
         bot.getClue(team,
                 requestQueue!!,
@@ -269,12 +261,12 @@ class MainActivity : AppCompatActivity() {
             1 -> {
 
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay!
                     val i = Intent(this, CameraActivity::class.java)
-                    val requestCode = if (gameState.value == GameState.EnterWords) RequestCode.WordRecognition else RequestCode.GridRecognition
-                    i.putExtra("RequestCode", requestCode)
-                    startActivityForResult(i, requestCode.ordinal)
+                    val recognitionType = if (gameState.value == GameState.EnterWords) RequestCode.WordRecognition else RequestCode.GridRecognition
+                    i.putExtra("RequestCode", recognitionType)
+                    startActivityForResult(i, recognitionType.ordinal)
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -307,26 +299,26 @@ class MainActivity : AppCompatActivity() {
         when (gameState.value) {
             GameState.EnterWords -> {
                 instructions.setText(R.string.instructions_enter_words)
-                optionsMenu?.findItem(R.id.action_new_game)?.setVisible(false)
+                optionsMenu?.findItem(R.id.action_new_game)?.isVisible = false
             }
 
             GameState.EnterColors -> {
                 instructions.setText(R.string.instructions_enter_colors)
-                optionsMenu?.findItem(R.id.action_new_game)?.setVisible(false)
+                optionsMenu?.findItem(R.id.action_new_game)?.isVisible = false
             }
 
             GameState.GetClues -> {
                 instructions.setText(R.string.instructions_get_clues)
-                optionsMenu?.findItem(R.id.action_new_game)?.setVisible(true)
+                optionsMenu?.findItem(R.id.action_new_game)?.isVisible = true
             }
         }
 
-        var cursorVisible = (gameState.value == GameState.EnterWords)
+        val cursorVisible = (gameState.value == GameState.EnterWords)
 
-        for(card in board!!.cards){
-            card.setCursorVisible(cursorVisible)
-            card.setFocusable(cursorVisible)
-            card.setFocusableInTouchMode(cursorVisible)
+        for (card in board!!.cards) {
+            card.isCursorVisible = cursorVisible
+            card.isFocusable = cursorVisible
+            card.isFocusableInTouchMode = cursorVisible
         }
     }
 
@@ -357,7 +349,7 @@ class MainActivity : AppCompatActivity() {
                     gameState.value = GameState.EnterWords
                     clueList!!.clear()
                 })
-                builder.setNegativeButton(R.string.new_game_no, { dialog, id ->
+                builder.setNegativeButton(R.string.new_game_no, { _, _ ->
                     // User cancelled the dialog
                 })
 
@@ -371,9 +363,9 @@ class MainActivity : AppCompatActivity() {
 
     // invoked when the activity may be temporarily destroyed, save the instance state here
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString("game_state", gameState.value.toString());
+        outState.putString("game_state", gameState.value.toString())
         board?.onSaveInstanceState(outState, "board")
-        super.onSaveInstanceState(outState);
+        super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(inState: Bundle) {
@@ -423,12 +415,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    external fun stringFromJNI(): String
 
     companion object {
 

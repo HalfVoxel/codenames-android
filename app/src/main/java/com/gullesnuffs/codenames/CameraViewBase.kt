@@ -1,7 +1,6 @@
 package com.gullesnuffs.codenames
 
 import android.content.Context
-import android.graphics.*
 import android.hardware.Camera
 import android.hardware.Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
 import android.util.Log
