@@ -28,6 +28,7 @@ class Board(var layout: TableLayout,
     val civiliansRemainingView = remainingLayout.findViewById(R.id.civilians_remaining) as TextView
     var currentAnimationSet : AnimatorSet
     var displayScores = false
+    var onClickCard : ((Word) -> Unit)? = null
 
     init {
         val inflater = LayoutInflater.from(context)
@@ -55,13 +56,7 @@ class Board(var layout: TableLayout,
 
             card.setAdapter<ArrayAdapter<String>>(autoCompleteAdapter)
             parent.setOnClickListener { _ ->
-                if (gameState.value == GameState.EnterColors) {
-                    word.type.value = paintType
-                    //updateLayout()
-                } else if (gameState.value == GameState.GetClues) {
-                    word.contacted.value = !word.contacted.value
-                    //updateLayout()
-                }
+                onClickCard?.invoke(word)
             }
 
             react({

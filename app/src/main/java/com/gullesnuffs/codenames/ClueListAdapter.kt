@@ -16,15 +16,15 @@ class ClueListAdapter(val clueList: ClueList, val itemClick: (Clue) -> Unit) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bindClue(clueList.list[position])
-        if(clueList.selectedClue == clueList.list[position]){
-            when(clueList.list[position].team){
+        val clue = clueList.list[position]
+        if (clueList.selectedClue.value == clue) {
+            when (clue.team) {
                 Team.Red ->
                     holder.itemView.setBackgroundResource(R.drawable.selected_clue_red_outline)
                 Team.Blue ->
                     holder.itemView.setBackgroundResource(R.drawable.selected_clue_blue_outline)
             }
-        }
-        else{
+        } else {
             holder.itemView.setBackgroundResource(R.drawable.unselected_clue_outline)
         }
     }

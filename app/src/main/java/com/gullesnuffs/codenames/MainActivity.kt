@@ -58,7 +58,6 @@ class MainActivity : AppCompatActivity() {
     var autoCompleteAdapter: ArrayAdapter<String>? = null
     var boardLayout: TableLayout? = null
     var requestQueue: RequestQueue? = null
-    var currentTargetClue: Clue? = null
     var optionsMenu: Menu? = null
 
     val constraintSet1 = ConstraintSet()
@@ -84,7 +83,8 @@ class MainActivity : AppCompatActivity() {
 
         val remainingLayout = findViewById(R.id.remaining_layout) as ViewGroup
 
-        board = Board(boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
+        val board = Board(boardLayout!!, remainingLayout, autoCompleteAdapter!!, gameState, this)
+        this.board = board
 
         val clueListView = findViewById(R.id.clue_list) as RecyclerView
         this.clueListView = clueListView
@@ -92,26 +92,38 @@ class MainActivity : AppCompatActivity() {
         clueList = ClueList(clueListView, this)
         val clueListAdapter = ClueListAdapter(clueList!!, { clue ->
             val targetWords = clue.getTargetWords()
-            if (clue == currentTargetClue) {
-                currentTargetClue = null
-                board!!.displayScores = false
-                clueList!!.unselect()
+            if (clue == clueList!!.selectedClue.value) {
+                board.displayScores = false
+                clueList!!.selectedClue.value = null
             } else {
-                currentTargetClue = clue
-                board!!.displayScores = true
+                board.displayScores = true
 
-                for (i in 0 until board!!.height) {
-                    for (j in 0 until board!!.width) {
-                        val word = board!!.words[i][j]
+                for (i in 0 until board.height) {
+                    for (j in 0 until board.width) {
+                        val word = board.words[i][j]
                         word.isTarget = word.word.value.toLowerCase() in targetWords
                         word.score = clue.getWordScore(word.word.value.toLowerCase())
                     }
                 }
-                clueList!!.setSelected(clue)
+                clueList!!.selectedClue.value = clue
             }
-            board!!.animateCardScores()
+            board.animateCardScores()
         })
         clueListView.adapter = clueListAdapter;
+
+        board.onClickCard = {
+            word ->
+
+            if (clueList!!.selectedClue.value != null) {
+                board.displayScores = false
+                clueList!!.selectedClue.value = null
+                board.animateCardScores()
+            } else if (gameState.value == GameState.EnterColors) {
+                word.type.value = board.paintType
+            } else if (gameState.value == GameState.GetClues) {
+                word.contacted.value = !word.contacted.value
+            }
+        }
 
         requestQueue = Volley.newRequestQueue(this)
 

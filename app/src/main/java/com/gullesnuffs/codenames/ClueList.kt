@@ -8,7 +8,19 @@ import android.widget.TextView
 class ClueList(var listView: RecyclerView,
                val context: Context) {
     val list = mutableListOf<Clue>()
-    var selectedClue: Clue? = null
+    val selectedClue = Observable<Clue?>(null)
+
+    init {
+        selectedClue.listen({
+            old, new ->
+
+            val index1 = list.indexOf(old)
+            if (index1 != -1) listView.adapter.notifyItemChanged(index1)
+
+            val index2 = list.indexOf(new)
+            if (index2 != -1) listView.adapter.notifyItemChanged(index2)
+        })
+    }
 
     fun addClue(clue: Clue) {
         list.add(0, clue)
@@ -32,18 +44,5 @@ class ClueList(var listView: RecyclerView,
         val oldSize = list.size
         list.clear()
         listView.adapter.notifyItemRangeRemoved(0, oldSize)
-    }
-
-    fun unselect() {
-        val index = list.indexOf(selectedClue)
-        if (index != -1) listView.adapter.notifyItemChanged(index)
-        selectedClue = null
-    }
-
-    fun setSelected(clue: Clue) {
-        unselect()
-        val index = list.indexOf(clue)
-        if (index != -1) listView.adapter.notifyItemChanged(index)
-        selectedClue = clue
     }
 }
