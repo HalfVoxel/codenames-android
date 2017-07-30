@@ -35,7 +35,7 @@ class ClueListAdapter(val clueList: ClueList, val itemClick: (Clue) -> Unit) :
 
         fun bindClue(clue: Clue) {
             with(clue) {
-                itemView.clue_word.text = clue.word
+                itemView.clue_word.text = clue.getWordNormalized()
                 itemView.clue_word.setTextColor(
                         itemView.resources.getColor(clue.getColor()))
                 itemView.clue_number.text = clue.number.toString()

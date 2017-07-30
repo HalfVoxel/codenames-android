@@ -10,6 +10,10 @@ class Clue(var word: String, var number: Int, var team: Team) {
         return word + "  " + number.toString()
     }
 
+    fun getWordNormalized(): String {
+        return word.toLowerCase().capitalize()
+    }
+
     fun getColor(): Int {
         return when (team) {
             Team.Red -> R.color.red_team_color

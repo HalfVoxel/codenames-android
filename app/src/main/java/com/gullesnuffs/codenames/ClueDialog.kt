@@ -20,7 +20,7 @@ class ClueDialog : DialogFragment() {
         {
             field = value
             if(value != null) {
-                clueWordView?.text = value.word
+                clueWordView?.text = value.getWordNormalized()
                 clueWordView?.setTextColor(resources.getColor(value.getColor()))
                 clueWordView?.visibility = View.VISIBLE
                 clueNumberView?.text = value.number.toString()

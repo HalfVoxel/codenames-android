@@ -29,7 +29,7 @@ class ClueList(var listView: RecyclerView,
 
         val listEntry = inflater.inflate(R.layout.clue_list_entry, null)
         val clueWordView = listEntry.findViewById(R.id.clue_word) as TextView
-        clueWordView.text = clue.word
+        clueWordView.text = clue.getWordNormalized()
         clueWordView.setTextColor(context.resources.getColor(clue.getColor()))
 
         val clueNumberView = listEntry.findViewById(R.id.clue_number) as TextView
