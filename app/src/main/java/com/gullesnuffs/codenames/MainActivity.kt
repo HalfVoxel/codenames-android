@@ -92,6 +92,7 @@ class MainActivity : AppCompatActivity() {
         clueList = ClueList(clueListView, this)
         val clueListAdapter = ClueListAdapter(clueList!!, { clue ->
             val targetWords = clue.getTargetWords()
+            val visibleWords = clue.explanation?.words ?: mutableListOf<String>()
             if (clue == clueList!!.selectedClue.value) {
                 board.displayScores = false
                 clueList!!.selectedClue.value = null
@@ -102,6 +103,7 @@ class MainActivity : AppCompatActivity() {
                     for (j in 0 until board.width) {
                         val word = board.words[i][j]
                         word.isTarget = word.word.value.toLowerCase() in targetWords
+                        word.isVisible = word.word.value.toLowerCase() in visibleWords
                         word.score = clue.getWordScore(word.word.value.toLowerCase())
                     }
                 }

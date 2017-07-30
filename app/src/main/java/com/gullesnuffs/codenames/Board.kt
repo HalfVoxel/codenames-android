@@ -147,6 +147,11 @@ class Board(var layout: TableLayout,
             anim.duration = anim.duration
             anim.startDelay = anim.startDelay
             currentAnimationSet.play(anim)
+
+            anim = ObjectAnimator.ofArgb(card, "textOverrideColor", card.textOverrideColor, Color.argb(0, 255, 255, 255))
+            anim.duration = anim.duration
+            anim.startDelay = anim.startDelay
+            currentAnimationSet.play(anim)
         }
         currentAnimationSet.start()
     }
@@ -165,9 +170,12 @@ class Board(var layout: TableLayout,
             var targetColor2 = Color.argb(255, (alpha * 255f).toInt(), (alpha * 255f).toInt(), (alpha * 255f).toInt())
 
             targetColor2 = card.colorMultiply(targetColor2, card.brighten(context.resources.getColor(word.getColor(GameState.EnterColors)), 0.1f))
+
+            var textTargetColor = if (word.isVisible) Color.TRANSPARENT else Color.argb(255, 60, 60, 60)
             if (!displayScores) {
-                targetColor1 = Color.argb(0, 0, 0, 0)
-                targetColor2 = Color.argb(0, 0, 0, 0)
+                targetColor1 = Color.TRANSPARENT
+                targetColor2 = Color.TRANSPARENT
+                textTargetColor = Color.TRANSPARENT
             }
 
             // Get a nicer transition if we start with the correct color values and just animate the alpha
@@ -183,6 +191,13 @@ class Board(var layout: TableLayout,
             anim2.duration = anim.duration
             anim2.startDelay = anim.startDelay
             currentAnimationSet.play(anim2)
+
+
+            if (Color.alpha(card.textOverrideColor) == 0) card.textOverrideColor = Color.argb(0, Color.red(textTargetColor), Color.green(textTargetColor), Color.blue(textTargetColor))
+            val anim3 = ObjectAnimator.ofArgb(card, "textOverrideColor", card.textOverrideColor, textTargetColor)
+            anim3.duration = anim.duration
+            anim3.startDelay = anim.startDelay
+            currentAnimationSet.play(anim3)
         }
         currentAnimationSet.start()
     }

@@ -38,6 +38,7 @@ class Card : AutoCompleteTextView {
 
     var borderOverrideColor: Int = Color.argb(0, 255, 255, 255)
     var surfaceOverrideColor: Int = Color.argb(0, 255, 255, 255)
+    var textOverrideColor: Int = Color.argb(0, 255, 255, 255)
     var editable = true
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -148,7 +149,7 @@ class Card : AutoCompleteTextView {
         radius -= inset * 0.5f
         paint.color = colorLerp(color, surfaceOverrideColor, Color.alpha(surfaceOverrideColor)/255f)
 
-        // setTextColor(if (brightness(paint.color) > 0.8f) Color.BLACK else Color.WHITE)
+        setTextColor(colorLerp(Color.WHITE, textOverrideColor, Color.alpha(textOverrideColor)/255f))
 
         setShadowLayer(10f, 0f, 0f, Color.argb((200 * brightness(paint.color)).toInt(), 0, 0, 0))
         canvas.drawRoundRect(rf, radius, radius, paint)

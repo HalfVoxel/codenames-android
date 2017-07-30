@@ -18,8 +18,19 @@ enum class WordType {
 class Word(val row : Int, val column : Int) {
     var word = Observable("")
     var type = Observable(WordType.Civilian)
+
+    /** True if the word has been taken */
     var contacted = Observable(false)
+
+    /** True if word is part of the bot's target words for the active clue (i.e the clue that is being explained) */
     var isTarget = false
+
+    /** True if word was not taken when the currently active clue was given.
+     * This determines if the word will be visible on the board when the scores are visualized.
+     */
+    var isVisible = true
+
+    /** Bot's score for the word for the currently active clue */
     var score = 0f
 
     override fun toString(): String {
