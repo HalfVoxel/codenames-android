@@ -35,21 +35,15 @@ class ClueList(var listView: RecyclerView,
     }
 
     fun unselect() {
-        for (i in 0 until list.size) {
-            if (list[i] == selectedClue) {
-                listView.adapter.notifyItemChanged(i)
-            }
-        }
+        val index = list.indexOf(selectedClue)
+        if (index != -1) listView.adapter.notifyItemChanged(index)
         selectedClue = null
     }
 
     fun setSelected(clue: Clue) {
         unselect()
-        for (i in 0 until list.size) {
-            if (list[i] == clue) {
-                listView.adapter.notifyItemChanged(i)
-            }
-        }
+        val index = list.indexOf(clue)
+        if (index != -1) listView.adapter.notifyItemChanged(index)
         selectedClue = clue
     }
 }
