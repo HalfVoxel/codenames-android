@@ -5,12 +5,11 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.constraint.ConstraintSet
-import android.support.transition.AutoTransition
-import android.support.transition.TransitionManager
 import android.support.v4.app.ActivityCompat
+import android.support.v4.view.animation.FastOutSlowInInterpolator
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -19,6 +18,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
+import android.view.animation.Transformation
 import android.widget.ArrayAdapter
 import android.widget.TableLayout
 import android.widget.Toast
@@ -28,6 +28,9 @@ import com.gullesnuffs.codenames.R.string.pref_inappropriate_default
 import com.gullesnuffs.codenames.R.string.pref_optimism_default
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.content_main_colors.*
+import kotlinx.android.synthetic.main.content_main_play.*
+import kotlinx.android.synthetic.main.content_main_words.*
 import java.util.*
 
 
@@ -52,21 +55,11 @@ class MainActivity : AppCompatActivity() {
     var requestQueue: RequestQueue? = null
     var optionsMenu: Menu? = null
 
-    val constraintSet1 = ConstraintSet()
-    val constraintSetPlay = ConstraintSet()
-    val constraintSetWords = ConstraintSet()
-    val constraintSetColors = ConstraintSet()
-
     var clueListView: RecyclerView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-        constraintSet1.clone(constraintLayout)
-        constraintSetPlay.clone(this, R.layout.content_main_play)
-        constraintSetWords.clone(this, R.layout.content_main_words)
-        constraintSetColors.clone(this, R.layout.content_main_colors)
 
         boardLayout = findViewById(R.id.board) as TableLayout
         autoCompleteAdapter = ArrayAdapter<String>(this,
@@ -121,14 +114,6 @@ class MainActivity : AppCompatActivity() {
 
         requestQueue = Volley.newRequestQueue(this)
 
-        nextGameState.setOnClickListener { _ ->
-            if (gameState.value == GameState.EnterWords) {
-                gameState.value = GameState.EnterColors
-            } else if (gameState.value == GameState.EnterColors) {
-                gameState.value = GameState.GetClues
-            }
-        }
-
         place_red_spy_button.setOnClickListener { _ ->
             board.paintType = WordType.Red
         }
@@ -153,15 +138,29 @@ class MainActivity : AppCompatActivity() {
             getClue(Team.Blue)
         }
 
-        take_a_photo.setOnClickListener { _ ->
-            launchCamera()
-        }
+        state_colors.findViewById(R.id.nextGameState).setOnClickListener { _ -> nextGameState() }
+        state_words.findViewById(R.id.nextGameState).setOnClickListener { _ -> nextGameState() }
 
-        randomize.setOnClickListener { _ -> randomize() }
+        state_colors.findViewById(R.id.take_a_photo).setOnClickListener { _ -> launchCamera() }
+        state_words.findViewById(R.id.take_a_photo).setOnClickListener { _ -> launchCamera() }
+
+        state_colors.findViewById(R.id.randomize).setOnClickListener { _ -> randomize() }
+        state_words.findViewById(R.id.randomize).setOnClickListener { _ -> randomize() }
 
         react({ onGameStateChanged() }, gameState)
+    }
 
+    override fun onResume() {
+        super.onStart()
         init(gameState)
+    }
+
+    fun nextGameState() {
+        if (gameState.value == GameState.EnterWords) {
+            gameState.value = GameState.EnterColors
+        } else if (gameState.value == GameState.EnterColors) {
+            gameState.value = GameState.GetClues
+        }
     }
 
     fun getClue(team: Team) {
@@ -180,11 +179,19 @@ class MainActivity : AppCompatActivity() {
                 })
     }
 
+    fun clearFocus() {
+        // Set focus to some control that cannot accept it
+        state_colors.findViewById(R.id.instructions).requestFocus()
+    }
+
     fun randomize() {
-        instructions.requestFocus()
+        clearFocus()
         val anim = RotateAnimation(0f, 360f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
         anim.duration = 500
-        randomize.startAnimation(anim)
+        val rand1 = state_colors.findViewById(R.id.randomize)
+        val rand2 = state_words.findViewById(R.id.randomize)
+        rand1.startAnimation(anim)
+        rand2.startAnimation(anim)
 
         when (gameState.value) {
             GameState.EnterWords -> {
@@ -286,32 +293,38 @@ class MainActivity : AppCompatActivity() {
                 1)
     }
 
+    fun lerp(a: Float, b: Float, t: Float): Float {
+        return a + (b - a) * t;
+    }
+
     fun onGameStateChanged() {
-        val transition = AutoTransition()
-        transition.duration = 150
-        TransitionManager.beginDelayedTransition(constraintLayout, transition)
-        val constraint = when (gameState.value) {
-            GameState.EnterWords -> constraintSetWords
-            GameState.EnterColors -> constraintSetColors
-            GameState.GetClues -> constraintSetPlay
+        val initialX = state_words.x
+        // Note that the width of the view cannot be used because this may be called before
+        // the first layout pass has been done
+        val width = Resources.getSystem().displayMetrics.widthPixels.toFloat()
+        val targetX = -gameState.value.ordinal * width
+        val anim = object : Animation() {
+            override fun applyTransformation(time: Float, t: Transformation?) {
+                val x = lerp(initialX, targetX, time)
+                state_words.x = x
+                state_colors.x = x + width * 1
+                state_play.x = x + width * 2
+
+                state_words.invalidate()
+                state_colors.invalidate()
+                state_play.invalidate()
+            }
         }
-        constraint.applyTo(constraintLayout)
 
-        when (gameState.value) {
-            GameState.EnterWords -> {
-                instructions.setText(R.string.instructions_enter_words)
-                optionsMenu?.findItem(R.id.action_new_game)?.isVisible = false
-            }
+        anim.startOffset = 0
+        anim.interpolator = FastOutSlowInInterpolator()
+        anim.duration = 400
+        state_group.startAnimation(anim)
 
-            GameState.EnterColors -> {
-                instructions.setText(R.string.instructions_enter_colors)
-                optionsMenu?.findItem(R.id.action_new_game)?.isVisible = false
-            }
-
-            GameState.GetClues -> {
-                instructions.setText(R.string.instructions_get_clues)
-                optionsMenu?.findItem(R.id.action_new_game)?.isVisible = true
-            }
+        optionsMenu?.findItem(R.id.action_new_game)?.isVisible = when (gameState.value) {
+            GameState.EnterWords -> false
+            GameState.EnterColors -> false
+            GameState.GetClues -> true
         }
 
         val cursorVisible = (gameState.value == GameState.EnterWords)
@@ -378,7 +391,7 @@ class MainActivity : AppCompatActivity() {
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             RequestCode.WordRecognition.ordinal -> {
-                instructions.requestFocus()
+                clearFocus()
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     for (i in 0 until 5) {
                         for (j in 0 until 5) {
@@ -387,11 +400,11 @@ class MainActivity : AppCompatActivity() {
                             board!!.words[i][j].word.value = word
                         }
                     }
-                    nextGameState.requestFocus()
+                    clearFocus()
                 }
             }
             RequestCode.GridRecognition.ordinal -> {
-                instructions.requestFocus()
+                clearFocus()
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     for (i in 0 until 5) {
                         for (j in 0 until 5) {

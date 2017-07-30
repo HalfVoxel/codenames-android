@@ -1,54 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/constraintLayout_words"
+    android:id="@+id/state_play"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.gullesnuffs.codenames.MainActivity"
-    tools:showIn="@layout/activity_main">
-
-    <TextView
-        android:id="@+id/instructions"
-        android:layout_width="wrap_content"
-        android:layout_height="19dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/board"
-        android:visibility="invisible"
-        />
+    app:layout_constraintTop_toBottomOf="@id/board"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    tools:showIn="@layout/content_main">
 
     <LinearLayout
         android:id="@+id/remaining_layout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/board"
-        android:visibility="visible"
-        />
-
-    <LinearLayout
-        android:id="@+id/color_picker"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/instructions"
-        android:visibility="invisible"
-        />
-
-    <LinearLayout
-        android:id="@+id/clue_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/remaining_layout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:visibility="visible"
-        />
+        app:layout_constraintTop_toBottomOf="@id/board">
+        <TextView
+            android:id="@+id/red_spies_remaining"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textSize="@dimen/remaining_text_size"
+            android:textColor="@color/red_team_color"
+            android:text="9">
+        </TextView>
+        <TextView
+            android:id="@+id/civilians_remaining"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textSize="@dimen/remaining_text_size"
+            android:textColor="@color/civilian_color"
+            android:text="7">
+        </TextView>
+        <TextView
+            android:id="@+id/blue_spies_remaining"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textSize="@dimen/remaining_text_size"
+            android:textColor="@color/blue_team_color"
+            android:text="8">
+        </TextView>
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/clue_list"
@@ -58,43 +61,38 @@
         android:layout_marginBottom="0dp"
         app:layout_constraintTop_toBottomOf="@id/clue_layout"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="visible"
-        />
-
-    <Button
-        android:id="@+id/randomize"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        app:layout_constraintTop_toBottomOf="@id/color_picker"
-        app:layout_constraintRight_toRightOf="@id/guideline1"
-        app:layout_constraintLeft_toRightOf="@id/guideline1"
-        app:layout_constraintBottom_toTopOf="@id/nextGameState"
-        android:visibility="invisible"
-        />
-
-    <Button
-        android:id="@+id/take_a_photo"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        app:layout_constraintTop_toBottomOf="@id/color_picker"
-        app:layout_constraintRight_toRightOf="@id/guideline2"
-        app:layout_constraintLeft_toRightOf="@id/guideline2"
-        app:layout_constraintBottom_toTopOf="@id/nextGameState"
-        android:visibility="invisible"
-        />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/nextGameState"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="50dp"
-        android:visibility="invisible"
+        android:alwaysDrawnWithCache="false"
+        android:animationCache="false"
         />
+
+    <LinearLayout
+        android:id="@+id/clue_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/remaining_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/get_red_clue_button"
+            android:layout_width="@dimen/get_clue_button_width"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/red_team_color"
+            android:layout_marginRight="@dimen/get_clue_button_padding"
+            android:text="Red clue">
+        </Button>
+        <Button
+            android:id="@+id/get_blue_clue_button"
+            android:layout_width="@dimen/get_clue_button_width"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/blue_team_color"
+            android:layout_marginLeft="@dimen/get_clue_button_padding"
+            android:text="Blue clue">
+        </Button>
+    </LinearLayout>
 
 
 </android.support.constraint.ConstraintLayout>
