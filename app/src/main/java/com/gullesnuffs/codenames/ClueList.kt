@@ -1,6 +1,7 @@
 package com.gullesnuffs.codenames
 
 import android.content.Context
+import android.os.Bundle
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.widget.TextView
@@ -44,5 +45,20 @@ class ClueList(var listView: RecyclerView,
         val oldSize = list.size
         list.clear()
         listView.adapter.notifyItemRangeRemoved(0, oldSize)
+    }
+
+
+    fun onSaveInstanceState(outState: Bundle, prefix: String) {
+        outState.putInt(prefix + "_clueNumber", list.size)
+        list.forEachIndexed { index, clue -> clue.onSaveInstanceState(outState, prefix + "_clue_" + index) }
+    }
+
+    fun onRestoreInstanceState(inState: Bundle, prefix: String) {
+        var clueNumber = inState.getInt(prefix + "_clueNumber")
+        for(i in 0 until clueNumber){
+            var clue = Clue("", 0, Team.Red)
+            clue.onRestoreInstanceState(inState, prefix + "_clue_" + i)
+            addClue(clue)
+        }
     }
 }

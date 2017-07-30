@@ -379,12 +379,14 @@ class MainActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString("game_state", gameState.value.toString())
         board?.onSaveInstanceState(outState, "board")
+        clueList?.onSaveInstanceState(outState, "clueList")
         super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(inState: Bundle) {
         gameState.value = GameState.valueOf(inState.getString("game_state"))
         board!!.onRestoreInstanceState(inState, "board")
+        clueList!!.onRestoreInstanceState(inState, "clueList")
         super.onRestoreInstanceState(inState)
     }
 
